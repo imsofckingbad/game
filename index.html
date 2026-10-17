@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0816">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Откровенно">
+<title>Откровенно — игры для вечеринки</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link rel="apple-touch-icon" id="ati">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0816;--text:#fff;--muted:rgba(255,255,255,.62);--glass:rgba(255,255,255,.07);--glass2:rgba(255,255,255,.12);--line:rgba(255,255,255,.13);
+--nhie:#ff8a3d;--truth:#2ee6c5;--dare:#ff3d7f;--violet:#8b5cf6;--acc:var(--nhie);--ok:#3ee08f;--r:22px}
+body[data-mode="td"]{--acc:var(--violet)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{min-height:100%;background:var(--bg)}
+body{color:var(--text);font-family:Manrope,system-ui,-apple-system,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#1d1236 0%,var(--bg) 60%)}
+.bg i{position:absolute;width:70vmax;height:70vmax;border-radius:50%;filter:blur(80px);opacity:.38;animation:float 22s ease-in-out infinite alternate}
+.bg i:nth-child(1){background:#7c3aed;top:-30vmax;left:-25vmax}
+.bg i:nth-child(2){background:#ff3d7f;bottom:-35vmax;right:-30vmax;animation-duration:28s}
+.bg i:nth-child(3){background:#ff8a3d;top:30%;left:40%;width:40vmax;height:40vmax;opacity:.2;animation-duration:18s}
+.bg:after{content:"";position:absolute;inset:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes float{to{transform:translate(12vmax,10vmax) scale(1.15)}}
+
+.screen{display:none;min-height:100vh;min-height:100dvh;padding:calc(12px + env(safe-area-inset-top)) 16px 0;max-width:560px;margin:0 auto;flex-direction:column;gap:14px}
+.screen.active{display:flex;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%)}
+.box{padding:16px;display:flex;flex-direction:column;gap:12px}
+h2{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+.hero{display:flex;align-items:center;gap:14px;padding:10px 2px 4px}
+.logo{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,var(--nhie),var(--dare) 60%,var(--violet));box-shadow:0 10px 30px -8px rgba(255,61,127,.7)}
+.hero h1{font-family:Unbounded,sans-serif;font-size:28px;letter-spacing:-.02em;line-height:1}
+.hero p{color:var(--muted);font-size:14px;margin-top:4px}
+
+button{font:inherit;border:0;color:var(--text);background:none;cursor:pointer;touch-action:manipulation}
+.btn{border-radius:18px;padding:16px 18px;font-weight:800;font-size:17px;background:var(--glass2);border:1px solid var(--line);transition:transform .15s,filter .15s}
+.btn:active{transform:scale(.96)}
+.btn.main{background:linear-gradient(100deg,var(--acc),color-mix(in srgb,var(--acc) 55%,#ff3d7f));border:0;box-shadow:0 12px 30px -10px var(--acc)}
+.btn.truth{background:linear-gradient(135deg,#2ee6c5,#0ea5a0);color:#062b27;border:0;box-shadow:0 12px 30px -10px #2ee6c5}
+.btn.dare{background:linear-gradient(135deg,#ff3d7f,#c0145a);border:0;box-shadow:0 12px 30px -10px #ff3d7f}
+.btn.soft{background:rgba(255,255,255,.06)}
+.ib{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:18px;background:var(--glass);border:1px solid var(--line)}
+input,select{font:inherit;background:rgba(0,0,0,.25);border:1px solid var(--line);color:var(--text);border-radius:14px;padding:13px 14px;font-size:16px;width:100%;outline:none}
+input:focus{border-color:var(--acc)}
+.row{display:flex;gap:8px;align-items:center}
+
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{text-align:left;padding:16px 14px;border-radius:var(--r);display:flex;flex-direction:column;gap:6px;min-height:150px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}
+.mode .me{font-size:34px}
+.mode b{font-family:Unbounded,sans-serif;font-size:15px;line-height:1.15}
+.mode small{color:var(--muted);font-size:12px;line-height:1.3}
+.mode.on{border-color:transparent;transform:translateY(-2px)}
+.mode[data-m="nhie"].on{background:linear-gradient(150deg,rgba(255,138,61,.35),rgba(255,61,127,.15));box-shadow:0 0 0 2px var(--nhie) inset,0 16px 40px -18px var(--nhie)}
+.mode[data-m="td"].on{background:linear-gradient(150deg,rgba(46,230,197,.28),rgba(255,61,127,.25));box-shadow:0 0 0 2px var(--violet) inset,0 16px 40px -18px var(--violet)}
+.mode.on:after{content:"✓";position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-size:13px;font-weight:800}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:14px;font-weight:700;transition:all .2s}
+.chip.on{background:var(--acc);border-color:transparent;color:#160b02}
+.chip.hot.on{background:var(--dare);color:#fff}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:16px}
+.seg button{padding:11px 6px;border-radius:12px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--glass2);color:#fff;box-shadow:0 4px 14px -6px rgba(0,0,0,.6)}
+.seg button.on.hot{background:var(--dare)}
+.toggle{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15px}
+.sw{width:50px;height:30px;border-radius:99px;background:rgba(255,255,255,.15);position:relative;transition:background .2s;flex:none}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw.on{background:var(--acc)}.sw.on:after{transform:translateX(20px)}
+
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.15) inset}
+.plist{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-weight:700;font-size:14px;animation:pop .3s ease}
+.pchip .av{width:32px;height:32px;font-size:16px}
+.pchip .x{width:28px;height:28px;border-radius:50%;color:var(--muted);font-size:13px}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.muted{color:var(--muted);font-size:13px;line-height:1.4}
+.aibox{display:flex;flex-direction:row;align-items:center;gap:12px;width:100%}
+.aibox .dot{width:10px;height:10px;border-radius:50%;background:#777;flex:none}
+.aibox .dot.on{background:var(--ok);box-shadow:0 0 12px var(--ok)}
+.aibox div{flex:1}
+.aibox b{font-size:15px}
+
+.dock{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0 calc(14px + env(safe-area-inset-bottom));margin-top:auto;background:linear-gradient(to top,var(--bg) 55%,transparent)}
+.dock .btn{flex:1}
+
+.top{display:flex;align-items:center;gap:8px}
+.status{flex:1;text-align:center;font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status.err{color:#ff8fae}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid var(--muted);border-top-color:transparent;border-radius:50%;animation:s 1s linear infinite;vertical-align:-1px;margin-right:5px}
+@keyframes s{to{transform:rotate(360deg)}}
+.timerbar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.timerbar i{display:block;height:100%;width:0;background:var(--acc)}
+
+.stack{display:grid;flex:1;min-height:320px;perspective:900px}
+.stack>*{grid-area:1/1}
+.ghost{border-radius:28px;background:var(--glass);border:1px solid var(--line)}
+.ghost.g1{transform:translateY(12px) scale(.95);opacity:.55}
+.ghost.g2{transform:translateY(24px) scale(.9);opacity:.3}
+.card{position:relative;z-index:2;border-radius:28px;padding:64px 24px 26px;display:flex;flex-direction:column;justify-content:center;gap:14px;touch-action:pan-y;user-select:none;-webkit-user-select:none;
+background:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inset,0 -40px 80px -50px var(--cardc,var(--acc)) inset;will-change:transform}
+.card:before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(80% 50% at 20% 0%,rgba(255,255,255,.14),transparent 60%);pointer-events:none}
+.card.truth{--cardc:var(--truth)}.card.dare{--cardc:var(--dare)}
+.tag{position:absolute;top:18px;left:18px;font-size:12px;font-weight:800;letter-spacing:.04em;padding:6px 12px;border-radius:999px;background:var(--cardc,var(--acc));color:#140a03}
+.card.dare .tag{color:#fff}
+.src{position:absolute;top:22px;right:20px;font-size:12px;color:var(--muted);font-weight:700}
+.prefix{color:var(--muted);font-size:19px;font-weight:700}
+.q{font-family:Unbounded,sans-serif;font-weight:800;font-size:clamp(23px,6.6vw,32px);line-height:1.22;letter-spacing:-.01em;min-height:1.2em}
+.q .w{display:inline-block;margin-right:.27em;animation:word .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes word{from{opacity:0;transform:translateY(12px);filter:blur(6px)}}
+.num{color:var(--muted);font-size:13px;font-weight:700;margin-top:auto}
+.card.loading .q{height:90px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.06) 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.hint{font-size:13px;color:var(--muted);font-weight:700;text-align:center}
+.avs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pb{display:flex;flex-direction:column;align-items:center;gap:5px;width:64px;font-size:12px;font-weight:700;color:var(--muted)}
+.pb .av{width:52px;height:52px;font-size:26px;transition:transform .2s,box-shadow .2s}
+.pb span{max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb.on{color:#fff}
+.pb.on .av{box-shadow:0 0 0 3px var(--ok),0 0 22px var(--ok);animation:bounce .45s}
+@keyframes bounce{40%{transform:translateY(-8px) scale(1.08)}}
+.turn{display:flex;align-items:center;gap:14px;padding:12px 14px}
+.turn .av{width:54px;height:54px;font-size:28px}
+.turn small{display:block;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.turn b{font-family:Unbounded,sans-serif;font-size:20px}
+.turn .sc{margin-left:auto;text-align:right;font-weight:800;font-size:13px;color:var(--muted)}
+
+.modal{position:fixed;inset:0;background:rgba(5,3,12,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.open{display:flex;animation:fade .2s}
+.sheet{width:100%;max-width:560px;border-radius:28px 28px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-height:90vh;overflow:auto;background:#17112b;border:1px solid var(--line);border-bottom:0;animation:up .3s cubic-bezier(.2,.8,.2,1)}
+.sheet:before{content:"";width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);align-self:center;margin-bottom:6px}
+@keyframes up{from{transform:translateY(60%)}}
+.sheet h3{font-family:Unbounded,sans-serif;font-size:20px}
+.lb{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.05)}
+.lb .md{width:26px;text-align:center;font-size:20px;font-weight:800}
+.lb .info{flex:1;display:flex;flex-direction:column;gap:6px;font-weight:700}
+.lb .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.lb .bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--dare));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.lb .pts{font-family:Unbounded,sans-serif;font-size:18px}
+.lb .rf{font-size:11px;color:var(--muted);font-weight:600}
+.conf{position:fixed;top:-10px;width:9px;height:14px;border-radius:2px;z-index:30;pointer-events:none;animation:fall 1.4s cubic-bezier(.3,.6,.5,1) forwards}
+@keyframes fall{to{transform:translate(var(--dx),105vh) rotate(var(--rot));opacity:.9}}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#fff;color:#111;font-weight:800;padding:10px 16px;border-radius:999px;z-index:40;animation:fade .25s;font-size:14px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-mode="nhie">
+<div class="bg"><i></i><i></i><i></i></div>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+  <header class="hero"><div class="logo">🔥</div><div><h1>Откровенно</h1><p>Игры для вечеринки с ИИ</p></div></header>
+  <div class="modes">
+    <button class="mode glass" data-m="nhie"><span class="me">🙊</span><b>Я никогда не…</b><small>Признавайся и набирай очки опыта</small></button>
+    <button class="mode glass" data-m="td"><span class="me">🎲</span><b>Правда или действие</b><small>По очереди, за отказ штраф</small></button>
+  </div>
+  <div class="glass box">
+    <h2>Игроки</h2>
+    <div class="row"><input id="pname" placeholder="Имя игрока" maxlength="14" enterkeyhint="done"><button class="ib" id="padd" style="width:52px;height:50px;font-size:22px">＋</button></div>
+    <div class="plist" id="plist"></div>
+    <div class="muted" id="phelp"></div>
+  </div>
+  <div class="glass box" id="optN">
+    <h2>Категории</h2>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="glass box" id="optT">
+    <h2>Уровень</h2>
+    <div class="seg" id="levels"></div>
+    <div class="toggle"><span>Случайный игрок вместо очереди</span><button class="sw" id="rndSw" aria-label="Случайный игрок"></button></div>
+  </div>
+  <button class="glass box aibox" id="aiBtn" style="text-align:left"><span class="dot" id="aiDot"></span><div><b>Генерация ИИ</b><div class="muted" id="aiInfo"></div></div><span style="font-size:20px">⚙️</span></button>
+  <div class="dock"><button class="btn main" id="start">Играть</button></div>
+</section>
+
+<!-- NHIE -->
+<section id="game" class="screen">
+  <div class="top"><button class="ib" data-back>←</button><div class="status" id="st1"></div><button class="ib" data-lb>🏆</button><button class="ib" data-set>⚙️</button></div>
+  <div class="timerbar" id="tbar" hidden><i id="tfill"></i></div>
+  <div class="stack"><div class="ghost g2"></div><div class="ghost g1"></div>
+    <div class="card" id="card"><span class="tag" id="tag"></span><span class="src" id="src"></span><div class="prefix">Я никогда не…</div><div class="q" id="q"></div><div class="num" id="num"></div></div>
+  </div>
+  <div class="hint" id="phint">Отметь, кто это делал 👇</div>
+  <div class="avs" id="pgrid"></div>
+  <div class="dock"><button class="btn main" id="next">Дальше →</button></div>
+</section>
+
+<!-- TRUTH OR DARE -->
+<section id="td" class="screen">
+  <div class="top"><button class="ib" data-back>←</button><div class="status" id="st2"></div><button class="ib" data-lb>🏆</button><button class="ib" data-set>⚙️</button></div>
+  <div class="glass turn"><div class="av" id="tAv"></div><div><small>Ходит</small><b id="tName"></b></div><div class="sc" id="tSc"></div></div>
+  <div class="stack"><div class="ghost g2"></div><div class="ghost g1"></div>
+    <div class="card" id="tcard"><span class="tag" id="ttag"></span><span class="src" id="tsrc"></span><div class="q" id="tq"></div><div class="num" id="tnum"></div></div>
+  </div>
+  <div class="dock" id="tChoose"><button class="btn truth" id="bTruth">Правда</button><button class="btn dare" id="bDare">Действие</button></div>
+  <div class="dock" id="tResult" hidden><button class="btn soft" id="bRef">Отказ −1</button><button class="btn main" id="bDone">Выполнил(а) +1</button></div>
+</section>
+
+<!-- SETTINGS -->
+<div class="modal" id="mSet"><div class="sheet">
+  <h3>Настройки</h3>
+  <div class="muted">Ключ Gemini API из aistudio.google.com. Хранится только в этом браузере.</div>
+  <div class="row"><input id="key" type="password" placeholder="AQ… или AIza…" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ib" id="keyShow" style="width:52px;height:50px">👁</button></div>
+  <button class="btn soft" id="keyTest">Проверить ключ</button>
+  <div class="muted" id="keyRes"></div>
+  <h2>Авто-смена вопроса («Я никогда не…»)</h2>
+  <select id="timer"><option value="0">Выключено</option><option value="15">Каждые 15 сек</option><option value="30">Каждые 30 сек</option><option value="60">Каждые 60 сек</option></select>
+  <button class="btn soft" id="resetSeen">Сбросить историю вопросов</button>
+  <button class="btn soft" id="resetScore">Обнулить счёт игроков</button>
+  <button class="btn main" id="setClose">Готово</button>
+</div></div>
+
+<!-- LEADERBOARD -->
+<div class="modal" id="mLb"><div class="sheet">
+  <h3 id="lbTitle">🏆 Рейтинг</h3>
+  <div id="lbList" style="display:flex;flex-direction:column;gap:8px"></div>
+  <button class="btn main" id="lbClose">Закрыть</button>
+</div></div>
+
+<script>
+const CATS={easy:"Лёгкие",funny:"Смешные",travel:"Путешествия",work:"Учёба и работа",love:"Отношения",couples:"Для пар",friends:"Для друзей",adult:"18+"};
+const BANK={
+easy:["ел(а) суши палочками с первого раза","был(а) в другой стране","видел(а) северное сияние","пел(а) в караоке","забывал(а) чей-то день рождения","смотрел(а) целый сезон сериала за одни выходные","готовил(а) что-то по рецепту из TikTok","катался(ась) на лошади","прыгал(а) с парашютом","играл(а) на музыкальном инструменте","был(а) на концерте в первом ряду","выигрывал(а) в лотерею","сдавал(а) кровь","держал(а) в руках змею","ночевал(а) в палатке","ломал(а) кость","красил(а) волосы в яркий цвет","бегал(а) забег на 10 км и больше","видел(а) океан","вставал(а) в пять утра ради рассвета","заводил(а) аквариумных рыбок","катался(ась) на сноуборде","пробовал(а) медитировать","вёл(а) дневник","делал(а) татуировку","летал(а) на воздушном шаре","читал(а) книгу за один день","собирал(а) пазл больше чем на 1000 деталей","ходил(а) в кино один(одна)","пробовал(а) устриц","выращивал(а) что-то на подоконнике","участвовал(а) в квизе или викторине"],
+funny:["падал(а) на ровном месте при людях","махал(а) человеку, который махал не мне","отправлял(а) сообщение не тому человеку","смеялся(ась) так, что напиток пошёл носом","делал(а) вид, что говорю по телефону, чтобы ни с кем не здороваться","проезжал(а) свою остановку, потому что уснул(а)","искал(а) телефон, держа его в руке","пел(а) в душе так громко, что слышали соседи","говорил(а) «вам тоже» официанту на «приятного аппетита»","заходил(а) не в тот туалет","застревал(а) в лифте","ходил(а) весь день в футболке наизнанку","разговаривал(а) с котом или собакой как с человеком","толкал(а) дверь с надписью «на себя»","путал(а) имя человека прямо во время разговора","врал(а), что смотрел(а) фильм, чтобы поддержать разговор","ел(а) то, что упало на пол","танцевал(а) перед зеркалом","гуглил(а) собственное имя","плакал(а) из-за мультфильма","случайно лайкал(а) старое фото, листая чужой профиль","смеялся(ась) в самый неподходящий момент","переспрашивал(а) три раза, а потом просто кивал(а)","спорил(а) с навигатором вслух","искал(а) ключи, которые были в кармане","путал(а) соль с сахаром","просыпал(а) важное событие","делал(а) больше 20 селфи ради одного удачного","здоровался(ась) с манекеном","отвечал(а) «и я тебя» в разговоре с кем-то малознакомым"],
+travel:["опаздывал(а) на самолёт","путешествовал(а) один(одна)","ездил(а) автостопом","терял(а) багаж","ночевал(а) в аэропорту","был(а) больше чем в 10 странах","ехал(а) в поезде больше суток","купался(ась) ночью в море","поднимался(ась) на гору выше 2000 метров","брал(а) машину напрокат за границей","обгорал(а) на солнце в первый же день отпуска","покупал(а) билет в последний момент","был(а) на другом континенте","ездил(а) на мотоцикле","летал(а) бизнес-классом","жил(а) в хостеле","терялся(ась) в чужом городе без интернета","пробовал(а) насекомых","встречал(а) Новый год за границей","путешествовал(а) совсем без плана","плавал(а) с маской среди рыб","видел(а) вулкан","переезжал(а) в другую страну","переходил(а) границу пешком","забывал(а) паспорт или документы в поездку","катался(ась) на верблюде","ночевал(а) в машине","ездил(а) в отпуск с малознакомыми людьми"],
+work:["списывал(а) на экзамене","прогуливал(а) уроки или пары","засыпал(а) на работе","опаздывал(а) на собеседование","увольнялся(ась) одним днём","приукрашивал(а) резюме","брал(а) больничный, когда не болел(а)","отправлял(а) письмо всем вместо одного человека","работал(а) ночную смену","плакал(а) на работе","сдавал(а) работу за минуту до дедлайна","получал(а) премию","жаловался(ась) на начальника в чате, где он тоже был","учил(а) всю ночь перед экзаменом","заваливал(а) экзамен","работал(а) на двух работах одновременно","сидел(а) на видеозвонке в пижамных штанах","притворялся(ась) занятым(ой), когда делать было нечего","выступал(а) перед большой аудиторией","получал(а) выговор","менял(а) профессию","работал(а) в кафе или ресторане","отвечал(а) на рабочие сообщения в отпуске","забывал(а) поесть из-за завала на работе","получал(а) похвалу при всём коллективе"],
+love:["ходил(а) на свидание вслепую","знакомился(ась) в приложении","влюблялся(ась) с первого взгляда","писал(а) бывшему(ей) после расставания","расставался(ась) по переписке","дарил(а) подарок, сделанный своими руками","ревновал(а) без причины","первым(ой) признавался(ась) в любви","специально оставлял(а) кого-то «на прочитанном»","мечтал(а) сбежать со свидания","листал(а) старые фото бывшего(ей)","влюблялся(ась) в друга или подругу","отменял(а) свидание в последний момент","встречался(ась) на расстоянии","писал(а) любовное письмо от руки","устраивал(а) романтический сюрприз","целовался(ась) под дождём","врал(а) о себе на первом свидании","просил(а) друзей оценить переписку с кем-то","пересылал(а) скриншоты чужой переписки друзьям","был(а) влюблён(а) безответно","встречался(ась) с кем-то старше на пять лет и больше","сводил(а) двух друзей"],
+couples:["забывал(а) нашу памятную дату","читал(а) переписку партнёра без спроса","притворялся(ась), что мне нравится подарок","ревновал(а) к коллеге партнёра","скрывал(а) реальную цену покупки","засыпал(а) на фильме, который выбрал партнёр","спорил(а) до конца, зная, что не прав(а)","думал(а) о свадьбе уже на первых свиданиях","съедал(а) вкусняшку, которую партнёр оставил себе","делал(а) вид, что сплю, чтобы не вставать первым(ой)","сравнивал(а) партнёра с бывшим(ей)","ругался(ась) из-за немытой посуды","говорил(а) «я не обиделся(ась)», когда обиделся(ась)","подглядывал(а) подарок заранее","писал(а) партнёру из соседней комнаты","мирился(ась) первым(ой), хотя был(а) прав(а)","оставлял(а) любовную записку","хотел(а) уйти после ссоры, но остался(ась)","выбирал(а) телефон вместо совместной прогулки","тайно планировал(а) наше общее будущее"],
+friends:["выдавал(а) чужой секрет","забывал(а) вернуть одолженные деньги","отменял(а) встречу с друзьями, чтобы остаться дома","ссорился(ась) с лучшим другом больше чем на месяц","неделями не отвечал(а) в общем чате","прикрывал(а) друга перед его родителями или партнёром","устраивал(а) розыгрыш, который зашёл слишком далеко","писал(а) «уже выхожу», ещё лёжа дома","обижался(ась), что меня не позвали","праздновал(а) день рождения больше двух дней подряд","оставался(ась) ночевать у друзей без предупреждения","брал(а) вещь друга и так и не вернул(а)","врал(а) другу, что его подарок мне понравился","сплетничал(а) о ком-то из присутствующих","дружил(а) с человеком из интернета, ни разу его не видев","устраивал(а) вечеринку-сюрприз","пел(а) хором на улице ночью","избегал(а) называть знакомого по имени, потому что забыл(а) его","встречал(а) рассвет после вечеринки","терял(а) друзей в толпе на концерте"],
+adult:["не помнил(а), как добрался(ась) домой","писал(а) ночью сообщение, о котором утром жалел(а)","целовался(ась) с незнакомцем","флиртовал(а), чтобы получить скидку","засыпал(а) в одежде после вечеринки","ходил(а) на два свидания за один вечер","отправлял(а) откровенное фото","врал(а) о количестве бывших","купался(ась) голышом","целовался(ась) с двумя людьми за одну ночь","играл(а) в игру на раздевание","просыпался(ась) не у себя дома после вечеринки","флиртовал(а) с кем-то из этой комнаты","придумывал(а) повод, чтобы уйти со свидания","ходил(а) на свидание с бывшим(ей) после расставания","танцевал(а) на столе или барной стойке","скрывал(а) отношения от всех","писал(а) «ты спишь?» после полуночи","влюблялся(ась) в кого-то за один вечер","целовался(ась) с кем-то на спор"]
+};
+const TD={
+truth:{
+easy:["Какой твой самый странный страх?","Какую песню ты слушал(а) больше всего за последний месяц?","Какое твоё самое неловкое детское воспоминание?","Кем ты хотел(а) стать в детстве?","Какую суперсилу ты бы выбрал(а) и зачем?","Какое блюдо ты мог(ла) бы есть каждый день?","Какой фильм ты пересматривал(а) больше всех?","Что ты делаешь, когда никто не видит?","Какая у тебя самая бесполезная привычка?","Какую вещь ты бы спас(ла) из горящего дома?","Кто из присутствующих лучше всех готовит, по-твоему?","Какой самый странный сон тебе снился?","Что ты последнее гуглил(а)? Только честно","Какое приложение съедает больше всего твоего времени?","Какой самый дурацкий подарок ты получал(а)?","Какая у тебя была самая неудачная причёска?","С какой знаменитостью ты бы хотел(а) поужинать?","Чего ты больше всего боялся(ась) в детстве?","Какой навык ты хочешь освоить в этом году?","Какое твоё любимое воспоминание с этой компанией?","За что тебя чаще всего хвалят?","Какая твоя самая глупая импульсивная покупка?","Какую страну ты мечтаешь посетить?","Что ты больше всего ценишь в друзьях?","Какой мем лучше всего описывает твою жизнь?","В какой эпохе ты хотел(а) бы пожить?","Какой самый смелый поступок в твоей жизни?","Что тебя больше всего бесит в людях?","Какая песня — твоё тайное музыкальное удовольствие?","На что ты тратишь больше всего денег?"],
+mid:["Когда ты последний раз врал(а) и кому?","Кому из присутствующих ты доверил(а) бы свой главный секрет?","Что бы ты изменил(а) в своей внешности, если бы мог(ла)?","Какой твой самый большой провал на работе или учёбе?","О чём ты жалеешь больше всего?","Чью переписку в своём телефоне ты бы ни за что не показал(а)?","Какое первое впечатление у тебя было о человеке справа?","Что ты никогда не рассказывал(а) родителям?","Кого из присутствующих ты взял(а) бы на необитаемый остров?","Какой поступок тебе до сих пор стыдно вспоминать?","Какое последнее фото в твоей галерее? Опиши честно","Кому ты завидуешь и почему?","Что ты думаешь о себе, но никогда не говоришь вслух?","Ты когда-нибудь читал(а) чужие сообщения? Чьи?","Какой самый неловкий момент был у тебя на свидании?","Что ты хотел(а) бы узнать о ком-то из присутствующих?","Какой самый безумный поступок ты совершил(а) ради любви?","Какую сплетню ты слышал(а) последней?","Какая самая большая ложь, в которую тебе поверили?","Чего ты боишься в отношениях?","Что бы ты сделал(а), если бы на сутки стал(а) невидимым(ой)?","Кому ты писал(а) последним и о чём?","Кто здесь самый красивый, по-твоему?","Какую черту характера ты в себе не любишь?","Ты когда-нибудь влюблялся(ась) в кого-то из друзей?","Какое самое странное сообщение ты отправлял(а)?","Какой комплимент ты хотел(а) бы слышать чаще?","Кто из бывших до сих пор иногда вспоминается?","Ты когда-нибудь притворялся(ась) больным(ой), чтобы куда-то не идти?","Какое приложение ты бы удалил(а), чтобы стать счастливее?"],
+hot:["Кто из присутствующих тебе больше всего нравится внешне?","Какой у тебя был самый неудачный поцелуй?","Что тебя сильнее всего привлекает в человеке с первого взгляда?","Ты когда-нибудь флиртовал(а) с кем-то, будучи в отношениях?","Какое самое смелое сообщение ты кому-то отправлял(а)?","Где было твоё самое необычное свидание?","Какую знаменитость ты считаешь самой привлекательной?","Какой самый романтичный поступок для тебя кто-то делал?","Был ли у тебя поцелуй, о котором никто не знает?","С кем из присутствующих ты пошёл(шла) бы на свидание?","На какой типаж ты всегда ведёшься?","Что ты делаешь, чтобы понравиться человеку?","Сколько у тебя было серьёзных отношений?","Какой самый странный подкат ты слышал(а)?","Что для тебя абсолютный «красный флаг» на свидании?","Ты когда-нибудь ревновал(а) кого-то из присутствующих?","Что бы ты хотел(а) попробовать на свидании, но стесняешься?","Кому из бывших ты дал(а) бы второй шанс?","Какой самый безбашенный поступок ты совершал(а) на вечеринке?","Опиши своего идеального партнёра тремя словами"]},
+dare:{
+easy:["Изобрази животное, пока остальные не угадают","Спой припев любой песни","Говори с акцентом до своего следующего хода","Станцуй 20 секунд без музыки","Расскажи анекдот. Если никто не засмеётся — ещё один","Сделай 10 приседаний","Изобрази кого-то из присутствующих, пусть угадают","Скажи алфавит задом наперёд как можно дальше","Сделай самое смешное селфи и покажи всем","Говори только шёпотом до своего следующего хода","Нарисуй портрет игрока слева за 30 секунд","Придумай рэп-строчку про человека справа","Скажи скороговорку три раза быстро","Покажи последний сохранённый мем","Простой в планке 30 секунд","Прорекламируй предмет, который ближе всего к тебе","Сделай комплимент каждому игроку","Пройди по комнате как модель на подиуме","Изображай робота до следующего хода","Расскажи про свой день голосом спортивного комментатора","Попробуй лизнуть свой локоть","Покажи свой лучший танцевальный приём","Говори о себе в третьем лице до следующего хода","Сделай смешное лицо и держи его 10 секунд","Объяви главную новость вечера как ведущий новостей","Назови 10 фруктов за 15 секунд","Пой вместо того, чтобы говорить, следующие 2 минуты","Изобрази оперного певца","Стой на одной ноге до следующего хода","Покажи фокус или изобрази фокусника"],
+mid:["Покажи последние 5 фото в галерее","Пусть группа придумает тебе прозвище до конца игры","Прочитай вслух последнее отправленное сообщение","Отправь голосовое кому-то из этой комнаты с признанием в дружбе","Покажи своё экранное время за неделю","Пусть игрок справа сделает тебе причёску подручными средствами","Изобрази, как ты выглядишь утром","Драматично признайся в любви предмету в комнате","Расскажи самую неловкую историю из своей жизни","Дай игроку 30 секунд полистать твою ленту рекомендаций","Покажи историю поиска на YouTube или TikTok","Съешь что-нибудь без помощи рук","Изобрази сцену из фильма, пусть угадают","Пусть группа выберет эмоцию — изображай её до следующего хода","Позволь игроку слева нарисовать что-то ручкой у тебя на руке","Хвали себя 30 секунд без остановки","Изобрази плачущего младенца","Разговаривай как пират до конца раунда","Каждый игрок задаёт тебе один вопрос — отвечай только честно","Сделай 15 отжиманий","Спой куплет песни, которую выберет группа","Изобрази влюблённого человека, который пишет сообщение","Покажи самую старую фотографию в галерее","Опиши каждого игрока одним словом","Выпей стакан воды не отрываясь","Изобрази свою маму или папу","Разыграй сценку «первое свидание» с игроком справа","Поменяйся аксессуаром с игроком слева до конца игры","Покажи последний скриншот в телефоне","Поставь на заставку фото, которое выберет группа, до конца игры"],
+hot:["Сделай комплимент внешности каждому игроку","Поцелуй в щёку игрока, которого выберет группа, если он согласен","Станцуй соблазнительный танец 20 секунд","Прошепчи игроку справа на ухо комплимент","Смотри в глаза игроку напротив 30 секунд и не смейся","Опиши свой идеальный поцелуй","Сыграй подкат к игроку слева — пусть оценит от 1 до 10","Сделай массаж плеч игроку справа 30 секунд, если он согласен","Покажи, как ты флиртуешь","Разыграй страстную сцену из мелодрамы с подушкой","Отправь «😘» тому из присутствующих, кого выберет группа","Признайся в симпатии кому-то из присутствующих в стиле романтического фильма","Обними игрока по выбору группы на 10 секунд, если он согласен","Станцуй медленный танец с игроком слева, если он согласен","Опиши свой самый горячий сон, без имён","Шепни игроку справа имя того, кто тебе здесь симпатичен","Покажи, как бы ты пригласил(а) кого-то на свидание","Сделай самый смелый комплимент игроку по выбору группы","Сними один аксессуар: часы, кольцо или носок","Расскажи о своём самом романтичном свидании с подробностями"]}};
+const LEVELS={easy:{name:"Лёгкий",desc:"безобидно и весело, подходит для любой компании"},mid:{name:"Средний",desc:"личное и немного неловкое, но без интима"},hot:{name:"Жаркий 18+",desc:"с флиртом и романтикой для взрослых, без грубостей, без описаний секса, без насилия и давления; любой физический контакт — только с согласия"}};
+const LEVEL_POOL={easy:["easy"],mid:["mid","easy"],hot:["hot","mid"]};
+const EMO=["😎","🦊","🐸","🐼","🦄","🐙","🔥","🌚","👻","🍕","🎧","🐱"];
+const COLORS=["#ff8a3d","#ff3d7f","#8b5cf6","#2ee6c5","#facc15","#38bdf8","#f472b6","#a3e635","#fb7185","#c084fc","#34d399","#fbbf24"];
+const LS="nhie_v1";
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0}}
+function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s){const d=Object.assign(defaults(),s);d.players.forEach((p,i)=>{p.color=p.color||COLORS[i%COLORS.length];p.refuse=p.refuse||0;p.score=p.score||0});return d}}catch(e){}return defaults()}
+let S=load();
+function save(){try{if(S.seen.length>3000)S.seen=S.seen.slice(-3000);if(S.tdSeen.length>3000)S.tdSeen=S.tdSeen.slice(-3000);localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+const norm=t=>String(t).toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
+const Q={n:[],truth:[],dare:[]},pend={n:null,truth:null,dare:null};
+let aiError="",cur=null,tcur=null,tPhase="choose",marks=new Set(),tmr=null;
+const vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+
+function avatar(p,cls){const d=document.createElement("div");d.className="av"+(cls?" "+cls:"");d.textContent=p.emoji;d.style.background="radial-gradient(circle at 30% 25%,"+p.color+"ee,"+p.color+"55)";return d}
+function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),1800)}
+function confetti(){if(RM)return;const cs=["#ff8a3d","#ff3d7f","#8b5cf6","#2ee6c5","#facc15","#fff"];
+  for(let i=0;i<46;i++){const c=document.createElement("i");c.className="conf";c.style.left=Math.random()*100+"vw";c.style.background=cs[i%cs.length];
+    c.style.setProperty("--dx",(Math.random()*160-80)+"px");c.style.setProperty("--rot",(Math.random()*720-360)+"deg");c.style.animationDelay=Math.random()*.25+"s";document.body.append(c);setTimeout(()=>c.remove(),1900)}}
+function leader(){let b=-1,bi=-1;S.players.forEach((p,i)=>{if(p.score>b){b=p.score;bi=i}});return b>0?bi:-1}
+function setWords(el,text){el.innerHTML="";String(text).split(" ").forEach((w,i)=>{const s=document.createElement("span");s.className="w";s.textContent=w;s.style.animationDelay=(i*40)+"ms";el.append(s)})}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  document.body.dataset.mode=S.mode;
+  document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("on",b.dataset.m===S.mode));
+  $("optN").hidden=S.mode!=="nhie";$("optT").hidden=S.mode!=="td";
+  const pl=$("plist");pl.innerHTML="";
+  S.players.forEach((p,i)=>{const d=document.createElement("div");d.className="pchip";const n=document.createElement("span");n.textContent=p.name;
+    const x=document.createElement("button");x.className="x";x.textContent="✕";x.onclick=()=>{S.players.splice(i,1);if(S.turn>=S.players.length)S.turn=0;save();renderHome()};
+    d.append(avatar(p),n,x);pl.append(d)});
+  $("phelp").textContent=S.mode==="td"?(S.players.length<2?"Для «Правды или действия» нужно минимум 2 игрока.":"Ходят по очереди, начиная с первого."):"Можно играть и без игроков — просто листать вопросы.";
+  const ch=$("chips");ch.innerHTML="";
+  Object.keys(CATS).forEach(c=>{const b=document.createElement("button");b.className="chip"+(c==="adult"?" hot":"")+(S.cats.includes(c)?" on":"");b.textContent=CATS[c];
+    b.onclick=()=>{if(S.cats.includes(c)){if(S.cats.length>1)S.cats=S.cats.filter(x=>x!==c)}
+      else{if(c==="adult"&&!confirm("Включить откровенные вопросы 18+? Только для взрослой компании."))return;S.cats.push(c)}
+      Q.n=Q.n.filter(q=>S.cats.includes(q.cat));save();renderHome()};ch.append(b)});
+  const lv=$("levels");lv.innerHTML="";
+  Object.keys(LEVELS).forEach(l=>{const b=document.createElement("button");b.textContent=LEVELS[l].name;b.className=(S.level===l?"on":"")+(l==="hot"?" hot":"");
+    b.onclick=()=>{if(l==="hot"&&S.level!=="hot"&&!confirm("Включить жаркий уровень 18+? Только для взрослых и с согласия всех."))return;S.level=l;Q.truth=[];Q.dare=[];save();renderHome()};lv.append(b)});
+  $("rndSw").classList.toggle("on",S.rnd);
+  $("aiDot").classList.toggle("on",!!S.apiKey);
+  $("aiInfo").textContent=S.apiKey?"Включена · Gemini придумывает новые вопросы":"Выключена · играем на встроенной базе. Нажми, чтобы добавить ключ";
+}
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;save();vib(8);renderHome()});
+$("rndSw").onclick=()=>{S.rnd=!S.rnd;save();renderHome()};
+function addPlayer(){const n=$("pname").value.trim();if(!n)return;if(S.players.length>=12){toast("Максимум 12 игроков");return}
+  const i=S.players.length;S.players.push({name:n,emoji:EMO[i%EMO.length],color:COLORS[i%COLORS.length],score:0,refuse:0});$("pname").value="";save();vib(8);renderHome();$("pname").focus()}
+$("padd").onclick=addPlayer;$("pname").onkeydown=e=>{if(e.key==="Enter")addPlayer()};
+$("start").onclick=()=>{
+  if(S.mode==="td"){if(S.players.length<2){toast("Добавь хотя бы двух игроков");$("pname").focus();return}
+    show("td");S.turn%=S.players.length;if(tPhase==="task"&&tcur)renderTask(false);else renderChoose(false);prefetch("truth");prefetch("dare")}
+  else{show("game");renderPlayers();if(!cur||!S.cats.includes(cur.cat))nextN(false);else{renderCard(false);startTimer()}}
+};
+document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{stopTimer();show("home");renderHome()});
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));scrollTo(0,0)}
+
+/* ---------- CARD ANIMATION ---------- */
+function fly(el,dir){return new Promise(res=>{if(RM){res();return}
+  el.style.transition="transform .28s ease-in,opacity .28s ease-in";el.style.transform="translateX("+(dir*120)+"%) rotate("+(dir*14)+"deg)";el.style.opacity="0";setTimeout(res,260)})}
+function enter(el){if(RM){el.style.transform="";el.style.opacity="";return}
+  el.style.transition="none";el.style.transform="translateY(18px) scale(.94)";el.style.opacity="0";void el.offsetWidth;
+  el.style.transition="transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s";el.style.transform="";el.style.opacity="1"}
+function dragable(el,onOut){let st=null;
+  el.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&e.button)return;st={x:e.clientX,y:e.clientY,dx:0,on:false};el.style.transition="none"});
+  el.addEventListener("pointermove",e=>{if(!st)return;st.dx=e.clientX-st.x;const dy=e.clientY-st.y;
+    if(!st.on&&Math.abs(st.dx)>8&&Math.abs(st.dx)>Math.abs(dy)){st.on=true;try{el.setPointerCapture(e.pointerId)}catch(_){}}
+    if(st.on)el.style.transform="translateX("+st.dx+"px) rotate("+(st.dx/18)+"deg) rotateY("+(st.dx/25)+"deg)"});
+  const end=()=>{if(!st)return;const dx=st.dx,on=st.on;st=null;
+    if(on&&Math.abs(dx)>90&&onOut()!==false){fly(el,Math.sign(dx))}
+    else{el.style.transition="transform .3s cubic-bezier(.2,.8,.2,1)";el.style.transform=""}};
+  el.addEventListener("pointerup",end);el.addEventListener("pointercancel",end)}
+
+/* ---------- NHIE ---------- */
+function renderPlayers(){
+  const g=$("pgrid");g.innerHTML="";const has=S.players.length>0;$("phint").hidden=!has;g.hidden=!has;
+  S.players.forEach((p,i)=>{const b=document.createElement("button");b.className="pb"+(marks.has(i)?" on":"");const n=document.createElement("span");n.textContent=p.name;b.append(avatar(p),n);
+    b.onclick=()=>{const before=leader();if(marks.has(i)){marks.delete(i);p.score--}else{marks.add(i);p.score++;vib(15)}save();
+      const after=leader();if(after!==before&&after>=0&&marks.has(after)){confetti();toast("👑 Новый лидер: "+S.players[after].name)}renderPlayers()};g.append(b)});
+}
+function pickBank(){
+  const seen=new Set(S.seen.map(norm));let pool=[];
+  S.cats.forEach(c=>BANK[c].forEach(t=>{if(!seen.has(norm(t)))pool.push({text:t,cat:c,src:"база"})}));
+  if(!pool.length){const all=new Set();S.cats.forEach(c=>BANK[c].forEach(t=>all.add(norm(t))));S.seen=S.seen.filter(t=>!all.has(norm(t)));save();
+    S.cats.forEach(c=>BANK[c].forEach(t=>pool.push({text:t,cat:c,src:"база"})));if(!S.apiKey)toast("Встроенные вопросы закончились — по кругу")}
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function takeN(){while(Q.n.length){const c=Q.n.shift();if(S.cats.includes(c.cat))return c}return null}
+let busyN=false;
+async function nextN(anim=true){
+  if(busyN)return;busyN=true;stopTimer();const card=$("card");
+  if(anim)await fly(card,-1);
+  if(S.apiKey&&!Q.n.length&&(pend.n||prefetch("n"))){card.classList.add("loading");$("q").textContent="";$("tag").textContent="ИИ думает…";$("src").textContent="";enter(card);
+    await Promise.race([pend.n,sleep(6000)]);card.classList.remove("loading")}
+  cur=takeN()||pickBank();marks=new Set();S.seen.push(cur.text);S.count++;save();
+  renderCard(true);renderPlayers();startTimer();prefetch("n");busyN=false;
+}
+function renderCard(anim){const card=$("card");card.classList.remove("loading");setWords($("q"),cur.text);$("tag").textContent=CATS[cur.cat];$("src").textContent=cur.src==="ИИ"?"✨ ИИ":"📚 база";$("num").textContent="Вопрос №"+S.count;if(anim!==false)enter(card);renderStatus()}
+$("next").onclick=()=>nextN();
+dragable($("card"),()=>{if(busyN)return false;setTimeout(()=>nextN(false),260)});
+function startTimer(){stopTimer();const t=+S.timer;$("tbar").hidden=!t;if(!t)return;
+  const f=$("tfill");f.style.transition="none";f.style.width="0";void f.offsetWidth;f.style.transition="width "+t+"s linear";f.style.width="100%";
+  tmr=setTimeout(()=>{if($("game").classList.contains("active"))nextN()},t*1000)}
+function stopTimer(){clearTimeout(tmr);tmr=null}
+
+/* ---------- TRUTH OR DARE ---------- */
+function curP(){return S.players[S.turn%S.players.length]}
+function renderTurn(){const p=curP();const a=$("tAv");a.replaceWith(Object.assign(avatar(p),{id:"tAv"}));$("tName").textContent=p.name;$("tSc").innerHTML="";const s=document.createElement("div");s.textContent="⭐ "+p.score;const r=document.createElement("div");r.textContent="🙅 "+p.refuse;$("tSc").append(s,r)}
+function renderChoose(anim=true){tPhase="choose";const c=$("tcard");c.className="card";c.classList.remove("loading");renderTurn();
+  $("ttag").textContent="Твой выбор";$("tsrc").textContent=LEVELS[S.level].name;setWords($("tq"),curP().name+", правда или действие?");$("tnum").textContent="Раунд "+(S.tcount+1);
+  $("tChoose").hidden=false;$("tResult").hidden=true;if(anim)enter(c);renderStatus()}
+function renderTask(anim=true){tPhase="task";const c=$("tcard");c.className="card "+tcur.type;renderTurn();
+  $("ttag").textContent=tcur.type==="truth"?"ПРАВДА":"ДЕЙСТВИЕ";$("tsrc").textContent=tcur.src==="ИИ"?"✨ ИИ":"📚 база";setWords($("tq"),tcur.text);$("tnum").textContent="Раунд "+S.tcount+" · "+LEVELS[tcur.level].name;
+  $("tChoose").hidden=true;$("tResult").hidden=false;if(anim)enter(c);renderStatus()}
+function pickTd(type){
+  const seen=new Set(S.tdSeen.map(norm));const lv=LEVEL_POOL[S.level];let pool=[];
+  lv.forEach((l,k)=>TD[type][l].forEach(t=>{if(!seen.has(norm(t)))for(let w=0;w<(k===0?3:1);w++)pool.push({text:t,type,level:l,src:"база"})}));
+  if(!pool.length){const all=new Set();lv.forEach(l=>TD[type][l].forEach(t=>all.add(norm(t))));S.tdSeen=S.tdSeen.filter(t=>!all.has(norm(t)));save();
+    lv.forEach(l=>TD[type][l].forEach(t=>pool.push({text:t,type,level:l,src:"база"})))}
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function takeT(type){while(Q[type].length){const c=Q[type].shift();if(c.level===S.level)return c}return null}
+let busyT=false;
+async function choose(type){
+  if(busyT)return;busyT=true;vib(10);const c=$("tcard");await fly(c,type==="truth"?-1:1);
+  if(S.apiKey&&!Q[type].length&&(pend[type]||prefetch(type))){c.className="card loading "+type;$("ttag").textContent="ИИ думает…";$("tq").textContent="";$("tsrc").textContent="";$("tChoose").hidden=true;enter(c);
+    await Promise.race([pend[type],sleep(6000)])}
+  tcur=takeT(type)||pickTd(type);S.tdSeen.push(tcur.text);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetch(type);busyT=false;
+}
+async function result(done){
+  if(busyT)return;busyT=true;const p=curP();const before=leader();
+  if(done){p.score++;vib(20)}else{p.score--;p.refuse++;vib([30,40,30]);toast("🙅 "+p.name+": −1 очко")}
+  save();const after=leader();if(done&&after!==before&&after>=0){confetti();toast("👑 Лидирует "+S.players[after].name)}
+  await fly($("tcard"),done?1:-1);
+  if(S.rnd&&S.players.length>1){let n;do{n=Math.floor(Math.random()*S.players.length)}while(n===S.turn%S.players.length);S.turn=n}else S.turn=(S.turn+1)%S.players.length;
+  save();tcur=null;renderChoose(true);busyT=false;
+}
+$("bTruth").onclick=()=>choose("truth");$("bDare").onclick=()=>choose("dare");
+$("bDone").onclick=()=>result(true);$("bRef").onclick=()=>result(false);
+
+/* ---------- STATUS ---------- */
+function renderStatus(){
+  [["st1","n"],["st2",null]].forEach(([id,k])=>{const s=$(id);s.className="status";
+    if(!S.apiKey){s.textContent="📚 Встроенная база";return}
+    const ld=k?pend[k]:(pend.truth||pend.dare);
+    if(ld){s.innerHTML='<span class="spin"></span>ИИ придумывает…';return}
+    if(aiError){s.textContent="⚠️ "+aiError;s.classList.add("err");return}
+    s.textContent=k?"✨ В запасе: "+Q.n.length:"✨ Правд: "+Q.truth.length+" · Действий: "+Q.dare.length});
+}
+
+/* ---------- AI (Gemini) ---------- */
+const API="https://generativelanguage.googleapis.com/v1beta/";
+let MODELS=null;
+function errText(st,j){const m=j.error?.message||"";if(st===401||st===403)return "Ключ не принят ("+st+"): "+m;if(st===429)return "Лимит запросов исчерпан, подожди минуту";if(st===503||/demand|overload/i.test(m))return "Модели Gemini перегружены, попробуй позже";return m||("HTTP "+st)}
+async function listModels(){
+  if(MODELS)return MODELS;
+  const r=await fetch(API+"models?pageSize=200",{headers:{"x-goog-api-key":S.apiKey}});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(errText(r.status,j));
+  const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name);
+  const bad=/image|tts|audio|live|embed|vision|learnlm|gemma|robotics|computer|native|thinking/i;
+  let c=ms.filter(n=>/gemini/i.test(n)&&/flash/i.test(n)&&!bad.test(n));
+  if(!c.length)c=ms.filter(n=>/gemini/i.test(n)&&!bad.test(n));
+  if(!c.length)throw new Error("Нет доступных моделей для этого ключа");
+  const ver=n=>parseFloat((n.match(/gemini-(\d+(?:\.\d+)?)/)||[0,0])[1]);
+  const pre=n=>/preview|exp/i.test(n)?1:0;
+  c.sort((a,b)=>pre(a)-pre(b)||ver(b)-ver(a)||(/lite/.test(a)-/lite/.test(b))||a.length-b.length);
+  if(S.model&&c.includes(S.model))c=[S.model,...c.filter(x=>x!==S.model)];
+  MODELS=c.slice(0,8);return MODELS;
+}
+async function callGemini(prompt){
+  const models=await listModels();let lastErr=null;
+  for(const model of models){
+    const r=await fetch(API+model+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.apiKey},
+      body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:1.1,responseMimeType:"application/json"}})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){if(S.model!==model){S.model=model;save()}
+      const txt=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("");
+      let arr;try{arr=JSON.parse(txt)}catch(e){const m=txt.match(/\[[\s\S]*\]/);try{arr=m?JSON.parse(m[0]):[]}catch(_){arr=[]}}
+      return Array.isArray(arr)?arr:[]}
+    lastErr=new Error(errText(r.status,j));if(r.status===401||r.status===403)throw lastErr;
+  }
+  throw lastErr||new Error("Все модели сейчас заняты");
+}
+function cleanN(t){return String(t).trim().replace(/^я\s+никогда\s+не\s*/i,"").replace(/^[«"]|[»"]$/g,"").replace(/[.!…]+$/,"").replace(/^./,c=>c.toLowerCase())}
+function cleanT(t){return String(t).trim().replace(/^(правда|действие)\s*[:\-—]\s*/i,"").replace(/^[«"]|[»"]$/g,"").replace(/^./,c=>c.toUpperCase())}
+async function genN(n){
+  const cats=S.cats.map(c=>c+" — "+CATS[c]).join(", ");
+  const avoid=[...S.seen.slice(-80),...Q.n.map(q=>q.text)].join("; ");
+  const prompt=`Ты придумываешь утверждения для компанейской игры «Я никогда не…» на русском языке.
+Сгенерируй ${n} новых утверждений. Категории (распредели примерно поровну, у каждого укажи id категории): ${cats}.
+Правила:
+- Пиши только продолжение фразы «Я никогда не», без самой этой фразы, с маленькой буквы, без точки в конце.
+- Глагол в прошедшем времени с женской формой в скобках: «прыгал(а) с парашютом», «терялся(ась) в лесу».
+- До 12 слов, конкретно, живо, с юмором. Выбирай то, что делала заметная часть людей (примерно 20–60%), чтобы было интересно признаваться.
+- Все утверждения разные по теме, без повторов и перефразирования друг друга.${S.cats.includes("adult")?"\n- Для категории adult: откровенно и с флиртом, но без грубостей, без подробных описаний секса и без насилия.":""}
+- Не повторяй и не перефразируй уже использованные: ${avoid||"—"}
+Ответ — только JSON-массив вида [{"text":"...","cat":"id"}].`;
+  const arr=await callGemini(prompt);
+  return arr.map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
+    .map(o=>({text:cleanN(o.text),cat:S.cats.includes(o.cat)?o.cat:S.cats[Math.floor(Math.random()*S.cats.length)],src:"ИИ"})).filter(o=>o.text.length>3);
+}
+async function genT(type,n){
+  const lv=S.level;const avoid=[...S.tdSeen.slice(-60),...Q[type].map(q=>q.text)].join("; ");
+  const what=type==="truth"
+    ?"вопросов «Правда» — личных вопросов, на которые игрок должен честно ответить вслух. Каждый — законченный вопрос со знаком вопроса"
+    :"заданий «Действие» — коротких заданий, которые игрок выполняет прямо сейчас в комнате с друзьями, с телефоном под рукой. Каждое — повелительное предложение";
+  const prompt=`Ты ведущий компанейской игры «Правда или действие» на русском языке.
+Сгенерируй ${n} ${what}.
+Уровень откровенности: «${LEVELS[lv].name}» — ${LEVELS[lv].desc}.
+Правила:
+- Обращайся к игроку на «ты», для слов с родом используй форму со скобками: «пробовал(а)», «готов(а)».
+- До 20 слов, конкретно, весело, без банальностей. Все варианты разные по теме.${type==="dare"?"\n- Только безопасные и выполнимые за 1–2 минуты задания: без алкоголя, без опасных трюков, без публикаций в соцсетях, без звонков и сообщений посторонним людям, без порчи вещей.":""}
+- Можно упоминать других игроков: «игрок слева», «игрок справа», «тот, кого выберет группа».
+- Не повторяй и не перефразируй уже использованные: ${avoid||"—"}
+Ответ — только JSON-массив строк.`;
+  const arr=await callGemini(prompt);
+  return arr.map(o=>typeof o==="string"?o:(o&&o.text)).filter(Boolean).map(t=>({text:cleanT(t),type,level:lv,src:"ИИ"})).filter(o=>o.text.length>5);
+}
+function prefetch(k){
+  if(!S.apiKey)return null;if(pend[k])return pend[k];if(Q[k].length>=6)return null;
+  const lvAt=S.level;
+  pend[k]=(async()=>{try{
+      const items=k==="n"?await genN(20):await genT(k,16);
+      const seenArr=k==="n"?S.seen:S.tdSeen;const have=new Set([...seenArr,...Q[k].map(q=>q.text)].map(norm));
+      items.forEach(it=>{if(k!=="n"&&lvAt!==S.level)return;const h=norm(it.text);if(!have.has(h)){have.add(h);Q[k].push(it)}});
+      for(let i=Q[k].length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[Q[k][i],Q[k][j]]=[Q[k][j],Q[k][i]]}
+      aiError=""}
+    catch(e){aiError=e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google":(e.message||"ошибка сети")}
+    finally{pend[k]=null;renderStatus()}})();
+  renderStatus();return pend[k];
+}
+
+/* ---------- MODALS ---------- */
+function openSet(){stopTimer();$("key").value=S.apiKey;$("timer").value=S.timer;$("keyRes").textContent=S.model?"Модель: "+S.model.replace("models/",""):"";$("mSet").classList.add("open")}
+document.querySelectorAll("[data-set]").forEach(b=>b.onclick=openSet);$("aiBtn").onclick=openSet;
+$("keyShow").onclick=()=>{const k=$("key");k.type=k.type==="password"?"text":"password"};
+$("key").onchange=()=>{const v=$("key").value.trim();if(v!==S.apiKey){S.apiKey=v;S.model="";MODELS=null;Q.n=[];Q.truth=[];Q.dare=[];aiError="";save()}};
+$("keyTest").onclick=async()=>{$("key").onchange();if(!S.apiKey){$("keyRes").textContent="Вставь ключ";return}
+  $("keyRes").innerHTML='<span class="spin"></span>Проверяю…';
+  try{const it=await genN(5);Q.n.push(...it);aiError="";$("keyRes").textContent="✅ Работает! Модель: "+S.model.replace("models/","")+". Пример: «Я никогда не "+(it[0]?.text||"…")+"»"}
+  catch(e){$("keyRes").textContent="❌ "+(e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google. Открой игру по ссылке в Safari/Chrome":e.message)}};
+$("timer").onchange=()=>{S.timer=+$("timer").value;save()};
+$("resetSeen").onclick=()=>{if(confirm("Сбросить историю показанных вопросов и заданий?")){S.seen=[];S.tdSeen=[];S.count=0;S.tcount=0;save();toast("История сброшена")}};
+$("resetScore").onclick=()=>{if(!confirm("Обнулить очки всех игроков?"))return;S.players.forEach(p=>{p.score=0;p.refuse=0});S.turn=0;save();renderPlayers();if($("td").classList.contains("active"))renderTurn();toast("Счёт обнулён")};
+$("setClose").onclick=()=>{$("key").onchange();$("mSet").classList.remove("open");renderHome();renderStatus();if($("game").classList.contains("active"))startTimer();
+  if(S.mode==="td"){prefetch("truth");prefetch("dare")}else prefetch("n")};
+document.querySelectorAll("[data-lb]").forEach(b=>b.onclick=()=>{
+  const l=$("lbList");l.innerHTML="";const ps=[...S.players].sort((a,b)=>b.score-a.score);const mx=Math.max(1,...ps.map(p=>p.score));
+  $("lbTitle").textContent=S.mode==="td"?"🏆 Самый смелый":"🏆 Самый опытный";
+  if(!ps.length)l.innerHTML='<div class="muted">Игроков пока нет</div>';
+  ps.forEach((p,i)=>{const d=document.createElement("div");d.className="lb";
+    const md=document.createElement("div");md.className="md";md.textContent=["🥇","🥈","🥉"][i]||(i+1);
+    const info=document.createElement("div");info.className="info";const nm=document.createElement("span");nm.textContent=p.name;
+    if(S.mode==="td"&&p.refuse){const rf=document.createElement("span");rf.className="rf";rf.textContent="отказов: "+p.refuse;nm.append(" ",rf)}
+    const bar=document.createElement("div");bar.className="bar";const bi=document.createElement("i");bar.append(bi);info.append(nm,bar);
+    const pts=document.createElement("div");pts.className="pts";pts.textContent=p.score;
+    d.append(md,avatar(p),info,pts);l.append(d);setTimeout(()=>bi.style.width=Math.max(0,p.score)/mx*100+"%",60+i*70)});
+  $("mLb").classList.add("open")});
+$("lbClose").onclick=()=>$("mLb").classList.remove("open");
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m){m.classList.remove("open");if(m.id==="mSet")$("setClose").onclick()}}));
+
+/* ---------- HOME SCREEN ICON ---------- */
+try{const cv=document.createElement("canvas");cv.width=cv.height=180;const x=cv.getContext("2d");const g=x.createLinearGradient(0,0,180,180);
+  g.addColorStop(0,"#ff8a3d");g.addColorStop(.6,"#ff3d7f");g.addColorStop(1,"#8b5cf6");x.fillStyle=g;x.fillRect(0,0,180,180);
+  x.font="110px serif";x.textAlign="center";x.textBaseline="middle";x.fillText("🔥",90,98);$("ati").href=cv.toDataURL("image/png")}catch(e){}
+
+renderHome();
+</script>
+</body>
+</html>
