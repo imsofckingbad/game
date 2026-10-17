@@ -120,6 +120,8 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
 .num{color:var(--muted);font-size:13px;font-weight:700;margin-top:auto}
 .card.loading .q{height:90px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.06) 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite}
 @keyframes shimmer{to{background-position:-200% 0}}
+.card.twist{box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 2px #facc15 inset,0 -40px 80px -50px var(--cardc) inset}
+.tw{font-weight:800;font-size:14px;line-height:1.35;padding:10px 12px;border-radius:14px;background:rgba(250,204,21,.14);color:#fde68a}
 .hint{font-size:13px;color:var(--muted);font-weight:700;text-align:center}
 .avs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .pb{display:flex;flex-direction:column;align-items:center;gap:5px;width:64px;font-size:12px;font-weight:700;color:var(--muted)}
@@ -174,9 +176,12 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
     <div class="chips" id="chips"></div>
   </div>
   <div class="glass box" id="optT">
-    <h2>Уровень</h2>
+    <h2>Режимы — можно несколько</h2>
+    <div class="chips" id="themes"></div>
+    <h2>Уровень откровенности</h2>
     <div class="seg" id="levels"></div>
     <div class="toggle"><span>Случайный игрок вместо очереди</span><button class="sw" id="rndSw" aria-label="Случайный игрок"></button></div>
+    <div class="toggle"><span>Сюрпризы: дуэли, ×2, «отвечают все»</span><button class="sw" id="twSw" aria-label="Сюрпризы"></button></div>
   </div>
   <button class="glass box aibox" id="aiBtn" style="text-align:left"><span class="dot" id="aiDot"></span><div><b>Генерация ИИ</b><div class="muted" id="aiInfo"></div></div><span style="font-size:20px">⚙️</span></button>
   <div class="dock"><button class="btn main" id="start">Играть</button></div>
@@ -199,7 +204,7 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
   <div class="top"><button class="ib" data-back>←</button><div class="status" id="st2"></div><button class="ib" data-lb>🏆</button><button class="ib" data-set>⚙️</button></div>
   <div class="glass turn"><div class="av" id="tAv"></div><div><small>Ходит</small><b id="tName"></b></div><div class="sc" id="tSc"></div></div>
   <div class="stack"><div class="ghost g2"></div><div class="ghost g1"></div>
-    <div class="card" id="tcard"><span class="tag" id="ttag"></span><span class="src" id="tsrc"></span><div class="q" id="tq"></div><div class="num" id="tnum"></div></div>
+    <div class="card" id="tcard"><span class="tag" id="ttag"></span><span class="src" id="tsrc"></span><div class="q" id="tq"></div><div class="tw" id="ttw" hidden></div><div class="num" id="tnum"></div></div>
   </div>
   <div class="dock" id="tChoose"><button class="btn truth" id="bTruth">Правда</button><button class="btn dare" id="bDare">Действие</button></div>
   <div class="dock" id="tResult" hidden><button class="btn soft" id="bRef">Отказ −1</button><button class="btn main" id="bDone">Выполнил(а) +1</button></div>
@@ -247,6 +252,29 @@ dare:{
 easy:["Изобрази животное, пока остальные не угадают","Спой припев любой песни","Говори с акцентом до своего следующего хода","Станцуй 20 секунд без музыки","Расскажи анекдот. Если никто не засмеётся — ещё один","Сделай 10 приседаний","Изобрази кого-то из присутствующих, пусть угадают","Скажи алфавит задом наперёд как можно дальше","Сделай самое смешное селфи и покажи всем","Говори только шёпотом до своего следующего хода","Нарисуй портрет игрока слева за 30 секунд","Придумай рэп-строчку про человека справа","Скажи скороговорку три раза быстро","Покажи последний сохранённый мем","Простой в планке 30 секунд","Прорекламируй предмет, который ближе всего к тебе","Сделай комплимент каждому игроку","Пройди по комнате как модель на подиуме","Изображай робота до следующего хода","Расскажи про свой день голосом спортивного комментатора","Попробуй лизнуть свой локоть","Покажи свой лучший танцевальный приём","Говори о себе в третьем лице до следующего хода","Сделай смешное лицо и держи его 10 секунд","Объяви главную новость вечера как ведущий новостей","Назови 10 фруктов за 15 секунд","Пой вместо того, чтобы говорить, следующие 2 минуты","Изобрази оперного певца","Стой на одной ноге до следующего хода","Покажи фокус или изобрази фокусника"],
 mid:["Покажи последние 5 фото в галерее","Пусть группа придумает тебе прозвище до конца игры","Прочитай вслух последнее отправленное сообщение","Отправь голосовое кому-то из этой комнаты с признанием в дружбе","Покажи своё экранное время за неделю","Пусть игрок справа сделает тебе причёску подручными средствами","Изобрази, как ты выглядишь утром","Драматично признайся в любви предмету в комнате","Расскажи самую неловкую историю из своей жизни","Дай игроку 30 секунд полистать твою ленту рекомендаций","Покажи историю поиска на YouTube или TikTok","Съешь что-нибудь без помощи рук","Изобрази сцену из фильма, пусть угадают","Пусть группа выберет эмоцию — изображай её до следующего хода","Позволь игроку слева нарисовать что-то ручкой у тебя на руке","Хвали себя 30 секунд без остановки","Изобрази плачущего младенца","Разговаривай как пират до конца раунда","Каждый игрок задаёт тебе один вопрос — отвечай только честно","Сделай 15 отжиманий","Спой куплет песни, которую выберет группа","Изобрази влюблённого человека, который пишет сообщение","Покажи самую старую фотографию в галерее","Опиши каждого игрока одним словом","Выпей стакан воды не отрываясь","Изобрази свою маму или папу","Разыграй сценку «первое свидание» с игроком справа","Поменяйся аксессуаром с игроком слева до конца игры","Покажи последний скриншот в телефоне","Поставь на заставку фото, которое выберет группа, до конца игры"],
 hot:["Сделай комплимент внешности каждому игроку","Поцелуй в щёку игрока, которого выберет группа, если он согласен","Станцуй соблазнительный танец 20 секунд","Прошепчи игроку справа на ухо комплимент","Смотри в глаза игроку напротив 30 секунд и не смейся","Опиши свой идеальный поцелуй","Сыграй подкат к игроку слева — пусть оценит от 1 до 10","Сделай массаж плеч игроку справа 30 секунд, если он согласен","Покажи, как ты флиртуешь","Разыграй страстную сцену из мелодрамы с подушкой","Отправь «😘» тому из присутствующих, кого выберет группа","Признайся в симпатии кому-то из присутствующих в стиле романтического фильма","Обними игрока по выбору группы на 10 секунд, если он согласен","Станцуй медленный танец с игроком слева, если он согласен","Опиши свой самый горячий сон, без имён","Шепни игроку справа имя того, кто тебе здесь симпатичен","Покажи, как бы ты пригласил(а) кого-то на свидание","Сделай самый смелый комплимент игроку по выбору группы","Сними один аксессуар: часы, кольцо или носок","Расскажи о своём самом романтичном свидании с подробностями"]}};
+const THEMES={
+classic:{e:"🎲",name:"Классика",desc:"универсальные правды и действия"},
+funny:{e:"😂",name:"Смешные",desc:"абсурдные и нелепые, чтобы все смеялись"},
+friends:{e:"🍻",name:"Компания",desc:"про самих игроков и их общую историю"},
+couples:{e:"💞",name:"Для пар",desc:"для влюблённой пары: романтичные, тёплые, игривые"},
+deep:{e:"🌙",name:"По душам",desc:"глубокие искренние разговоры о жизни, мечтах и чувствах"},
+creative:{e:"🎭",name:"Импровизация",desc:"сценки, фантазия, придумывание на ходу"},
+active:{e:"⚡",name:"Активные",desc:"движение и физические задания, безопасные в комнате"}};
+const TDT={
+funny:{truth:["Какой самый нелепый способ, которым ты травмировался(ась)?","Какое самое глупое сообщение ты отправлял(а) по ошибке?","Какая самая странная вещь есть в твоём телефоне?","Какое прозвище у тебя было в детстве и почему?","Что самое смешное ты делал(а) в полусне?","Какой самый дурацкий спор ты проиграл(а)?","Над чем ты смеёшься, хотя тебе стыдно?","Какую самую нелепую отмазку ты придумывал(а)?","Какой у тебя был самый провальный кулинарный эксперимент?","Какое странное сочетание еды тебе нравится?","Какой твой самый позорный танец на людях?","Кого ты случайно назвал(а) «мама» или «папа»?"],
+ dare:["Говори голосом мультяшного персонажа до следующего хода","Изобрази кота, который увидел огурец","Расскажи сказку «Колобок» за 30 секунд как рэпер","Изобрази чихающего динозавра","Объясни, что такое смартфон, как будто ты из 1800-х","Изобрази бабушку, которая впервые открыла TikTok","Пройди по комнате как пингвин","Сыграй сцену «опоздал(а) на автобус» в замедленной съёмке","Придумай и покажи новое приветствие для всех","Прорекламируй носок так, будто это айфон","Говори только вопросами до следующего хода","Изобрази стиральную машину в режиме отжима"]},
+friends:{truth:["Кто из присутствующих первым попадёт в историю?","Кто здесь лучше всех хранит секреты?","С кем из присутствующих ты поменялся(ась) бы жизнью на день?","Какое первое впечатление было у тебя о каждом из нас?","Какую историю про нашу компанию ты рассказываешь другим?","Кто из нас скорее всего станет знаменитым?","Кого из нас ты позовёшь первым, если попадёшь в беду?","Что ты никогда не говорил(а) кому-то из присутствующих?","Кто здесь самый смешной?","Какой момент с нами ты пережил(а) бы ещё раз?","На кого из нас ты когда-то молча обижался(ась)?","Кто из присутствующих хуже всех готовит?"],
+ dare:["Изобрази каждого игрока одним жестом","Расскажи, как вы познакомились с игроком справа, но всё перепутай","Придумай кричалку для компании и научи всех","Сделай групповое селфи с самыми странными лицами","Скажи каждому игроку, за что ты его ценишь","Напой мелодию, остальные угадывают песню","Изобрази, как наша компания собирается куда-то выходить","Расскажи, какими мы все будем через 20 лет","Повторяй движения игрока справа до следующего хода","Придумай прозвище для каждого игрока","Дай игроку слева задать тебе любой вопрос — отвечай честно","Выбери, кто здесь самый стильный, и объясни почему"]},
+couples:{truth:["Что ты впервые подумал(а) обо мне?","Какой момент с нами ты вспоминаешь чаще всего?","Что во мне сначала бесило, а потом понравилось?","Какое наше свидание было лучшим?","Что ты хочешь, чтобы я делал(а) чаще?","О чём ты боишься меня попросить?","Какую мою привычку ты втайне обожаешь?","Где ты хотел(а) бы оказаться со мной прямо сейчас?","Когда ты понял(а), что я тебе нравлюсь?","Какой для тебя идеальный совместный выходной?","Какой мой поступок тронул тебя сильнее всего?","Что ты хотел(а) бы попробовать вместе впервые?"],
+ dare:["Сделай партнёру комплимент, который он ещё не слышал","Изобрази партнёра, когда он голоден","Обними партнёра на 20 секунд","Перескажи ваше первое свидание за 30 секунд","Спой партнёру хотя бы куплет песни о любви","Нарисуй ваш совместный портрет за минуту","Придумай вам парное прозвище","Покажи, как флиртует партнёр, по-твоему","Признайся в любви на выдуманном языке","Сделай партнёру массаж рук минуту","Расскажи о вашем будущем отпуске так, будто он уже был","Поцелуй партнёра туда, куда он скажет: в лоб, щёку или руку"]},
+deep:{truth:["Что по-настоящему делает тебя счастливым(ой)?","О чём ты мечтаешь, но никому не говоришь?","Какой совет ты дал(а) бы себе пять лет назад?","Чего ты больше всего боишься в будущем?","Какой момент изменил твою жизнь?","За что ты благодарен(на) в этом году?","Что ты хочешь успеть сделать за жизнь?","Когда ты последний раз плакал(а) и почему?","Какое качество ты хочешь в себе развить?","Кто повлиял на тебя сильнее всего?","Что для тебя значит настоящая дружба?","О каком решении ты до сих пор думаешь «а что если»?"],
+ dare:["Скажи каждому игроку что-то тёплое и искреннее","Расскажи о человеке, который изменил твою жизнь","Минуту говори о том, что ты в себе любишь","Опиши свою жизнь через 10 лет","Поблагодари кого-то из присутствующих за конкретный поступок","Назови три вещи, за которые ты благодарен(на) сегодня","30 секунд расскажи о своей самой смелой мечте","Включи песню, которая много для тебя значит, и объясни почему","Расскажи историю из детства, которая тебя сформировала","Отправь кому-то из этой комнаты сообщение с благодарностью","Посмотри в глаза игроку справа и скажи, что ты в нём уважаешь","Расскажи, чему тебя научила самая большая ошибка"]},
+creative:{truth:["Если бы твоя жизнь была фильмом, как бы он назывался?","Какую песню ты выбрал(а) бы своим гимном?","Каким животным ты был(а) бы и почему?","Какой суперзлодей получился бы из тебя?","Если бы ты открыл(а) свой бизнес, что бы это было?","Какой предмет в комнате больше всего похож на тебя?","Кем ты работал(а) бы в другой жизни?","Если бы у тебя был свой праздник, как бы он проходил?","Какой персонаж из фильма больше всего похож на тебя?","Какой фразой начиналась бы твоя автобиография?","Какой закон ты придумал(а) бы, если бы мог(ла)?","Как называлась бы твоя музыкальная группа?"],
+ dare:["Придумай рекламу игрока слева за 30 секунд","Сочини четверостишие про этот вечер","Расскажи историю из трёх слов, которые назовут игроки","Покажи фильм без слов, пусть угадают","Минуту будь экскурсоводом по этой комнате","Придумай новое название для этой игры и защити его","Расскажи прогноз погоды на завтра как драматический фильм","Изобрази предмет в комнате, пусть угадают","Придумай и спой джингл для любого продукта","Сыграй «интервью со звездой» с игроком справа","Расскажи сказку, где главный герой — игрок слева","Покажи радость тремя совершенно разными способами"]},
+active:{truth:["Какой вид спорта ты хотел(а) бы освоить?","Какой у тебя самый большой спортивный провал?","Сколько отжиманий ты реально сделаешь прямо сейчас?","Какой самый долгий поход или прогулка в твоей жизни?","Какой твой рекорд по сну?","Как ты лучше всего снимаешь стресс?"],
+ dare:["Сделай 20 прыжков на месте","Присядь 15 раз","Простой в планке 45 секунд","Проведи для всех 30-секундную разминку как фитнес-тренер","Пройди через комнату гусиным шагом","Сделай 10 выпадов","Постой на одной ноге с закрытыми глазами 15 секунд","Выполни упражнение, которое придумает игрок справа","Танцуй целый припев любой песни","Изобрази бег в замедленной съёмке 20 секунд","Посиди «стульчиком» у стены 30 секунд","Устрой с игроком слева битву в планке — кто дольше"]}};
+const TWISTS={truth:[{label:"ОТВЕЧАЮТ ВСЕ",note:"🔁 Сюрприз: на этот вопрос по кругу отвечает каждый",mult:1},{label:"×2",note:"💎 Сюрприз: двойные очки за честный ответ",mult:2},{label:"НАПАРНИК",note:"🎯 Сюрприз: выбери, кто ответит вместе с тобой",mult:1}],
+dare:[{label:"ДУЭЛЬ",note:"⚔️ Сюрприз: игрок слева выполняет тоже, лучшего выбирает группа",mult:1},{label:"×2",note:"💎 Сюрприз: двойные очки за выполнение",mult:2},{label:"ПЕРЕДАЙ",note:"🎁 Сюрприз: можешь отдать задание любому игроку, очки всё равно твои",mult:1}]};
 const LEVELS={easy:{name:"Лёгкий",desc:"безобидно и весело, подходит для любой компании"},mid:{name:"Средний",desc:"личное и немного неловкое, но без интима"},hot:{name:"Жаркий 18+",desc:"с флиртом и романтикой для взрослых, без грубостей, без описаний секса, без насилия и давления; любой физический контакт — только с согласия"}};
 const LEVEL_POOL={easy:["easy"],mid:["mid","easy"],hot:["hot","mid"]};
 const EMO=["😎","🦊","🐸","🐼","🦄","🐙","🔥","🌚","👻","🍕","🎧","🐱"];
@@ -255,7 +283,7 @@ const LS="nhie_v1";
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
-function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0}}
+function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0,themes:["classic","funny","friends"],twists:true}}
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s){const d=Object.assign(defaults(),s);d.players.forEach((p,i)=>{p.color=p.color||COLORS[i%COLORS.length];p.refuse=p.refuse||0;p.score=p.score||0});return d}}catch(e){}return defaults()}
 let S=load();
 function save(){try{if(S.seen.length>3000)S.seen=S.seen.slice(-3000);if(S.tdSeen.length>3000)S.tdSeen=S.tdSeen.slice(-3000);localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
@@ -290,12 +318,17 @@ function renderHome(){
   const lv=$("levels");lv.innerHTML="";
   Object.keys(LEVELS).forEach(l=>{const b=document.createElement("button");b.textContent=LEVELS[l].name;b.className=(S.level===l?"on":"")+(l==="hot"?" hot":"");
     b.onclick=()=>{if(l==="hot"&&S.level!=="hot"&&!confirm("Включить жаркий уровень 18+? Только для взрослых и с согласия всех."))return;S.level=l;Q.truth=[];Q.dare=[];save();renderHome()};lv.append(b)});
-  $("rndSw").classList.toggle("on",S.rnd);
+  const tc=$("themes");tc.innerHTML="";
+  Object.keys(THEMES).forEach(t=>{const b=document.createElement("button");b.className="chip"+(S.themes.includes(t)?" on":"");b.textContent=THEMES[t].e+" "+THEMES[t].name;
+    b.onclick=()=>{if(S.themes.includes(t)){if(S.themes.length>1)S.themes=S.themes.filter(x=>x!==t);else{toast("Нужен хотя бы один режим");return}}else S.themes.push(t);
+      Q.truth=[];Q.dare=[];save();vib(8);renderHome()};tc.append(b)});
+  $("rndSw").classList.toggle("on",S.rnd);$("twSw").classList.toggle("on",S.twists);
   $("aiDot").classList.toggle("on",!!S.apiKey);
   $("aiInfo").textContent=S.apiKey?"Включена · Gemini придумывает новые вопросы":"Выключена · играем на встроенной базе. Нажми, чтобы добавить ключ";
 }
 document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;save();vib(8);renderHome()});
 $("rndSw").onclick=()=>{S.rnd=!S.rnd;save();renderHome()};
+$("twSw").onclick=()=>{S.twists=!S.twists;save();renderHome()};
 function addPlayer(){const n=$("pname").value.trim();if(!n)return;if(S.players.length>=12){toast("Максимум 12 игроков");return}
   const i=S.players.length;S.players.push({name:n,emoji:EMO[i%EMO.length],color:COLORS[i%COLORS.length],score:0,refuse:0});$("pname").value="";save();vib(8);renderHome();$("pname").focus()}
 $("padd").onclick=addPlayer;$("pname").onkeydown=e=>{if(e.key==="Enter")addPlayer()};
@@ -361,27 +394,33 @@ function renderTurn(){const p=curP();const a=$("tAv");a.replaceWith(Object.assig
 function renderChoose(anim=true){tPhase="choose";const c=$("tcard");c.className="card";c.classList.remove("loading");renderTurn();
   $("ttag").textContent="Твой выбор";$("tsrc").textContent=LEVELS[S.level].name;setWords($("tq"),curP().name+", правда или действие?");$("tnum").textContent="Раунд "+(S.tcount+1);
   $("tChoose").hidden=false;$("tResult").hidden=true;if(anim)enter(c);renderStatus()}
-function renderTask(anim=true){tPhase="task";const c=$("tcard");c.className="card "+tcur.type;renderTurn();
-  $("ttag").textContent=tcur.type==="truth"?"ПРАВДА":"ДЕЙСТВИЕ";$("tsrc").textContent=tcur.src==="ИИ"?"✨ ИИ":"📚 база";setWords($("tq"),tcur.text);$("tnum").textContent="Раунд "+S.tcount+" · "+LEVELS[tcur.level].name;
+function themeName(t){return THEMES[t]?THEMES[t].e+" "+THEMES[t].name:""}
+function renderTask(anim=true){tPhase="task";const c=$("tcard");c.className="card "+tcur.type+(tcur.twist?" twist":"");renderTurn();
+  $("ttag").textContent=(tcur.type==="truth"?"ПРАВДА":"ДЕЙСТВИЕ")+(tcur.twist?" · "+tcur.twist.label:"");
+  $("tsrc").textContent=tcur.src==="ИИ"?"✨ ИИ":"📚 база";setWords($("tq"),tcur.text);
+  $("ttw").hidden=!tcur.twist;$("ttw").textContent=tcur.twist?tcur.twist.note:"";
+  $("tnum").textContent="Раунд "+S.tcount+" · "+themeName(tcur.theme)+" · "+LEVELS[tcur.level].name;
+  $("bDone").textContent="Выполнил(а) +"+(tcur.twist?tcur.twist.mult:1);
   $("tChoose").hidden=true;$("tResult").hidden=false;if(anim)enter(c);renderStatus()}
-function pickTd(type){
-  const seen=new Set(S.tdSeen.map(norm));const lv=LEVEL_POOL[S.level];let pool=[];
-  lv.forEach((l,k)=>TD[type][l].forEach(t=>{if(!seen.has(norm(t)))for(let w=0;w<(k===0?3:1);w++)pool.push({text:t,type,level:l,src:"база"})}));
-  if(!pool.length){const all=new Set();lv.forEach(l=>TD[type][l].forEach(t=>all.add(norm(t))));S.tdSeen=S.tdSeen.filter(t=>!all.has(norm(t)));save();
-    lv.forEach(l=>TD[type][l].forEach(t=>pool.push({text:t,type,level:l,src:"база"})))}
-  return pool[Math.floor(Math.random()*pool.length)];
-}
-function takeT(type){while(Q[type].length){const c=Q[type].shift();if(c.level===S.level)return c}return null}
+function bankTd(type){const out=[];const lv=LEVEL_POOL[S.level];
+  S.themes.forEach(th=>{if(th==="classic")lv.forEach((l,k)=>TD[type][l].forEach(t=>{for(let w=0;w<(k===0?3:1);w++)out.push({text:t,type,level:l,theme:"classic",src:"база"})}));
+    else ((TDT[th]||{})[type]||[]).forEach(t=>out.push({text:t,type,level:S.level,theme:th,src:"база"}))});
+  if(!out.length)TD[type][S.level].forEach(t=>out.push({text:t,type,level:S.level,theme:"classic",src:"база"}));
+  return out}
+function pickTd(type){const seen=new Set(S.tdSeen.map(norm));const all=bankTd(type);let pool=all.filter(o=>!seen.has(norm(o.text)));
+  if(!pool.length){const ks=new Set(all.map(o=>norm(o.text)));S.tdSeen=S.tdSeen.filter(t=>!ks.has(norm(t)));save();pool=all}
+  return pool[Math.floor(Math.random()*pool.length)]}
+function takeT(type){while(Q[type].length){const c=Q[type].shift();if(c.level===S.level&&S.themes.includes(c.theme))return c}return null}
 let busyT=false;
 async function choose(type){
   if(busyT)return;busyT=true;vib(10);const c=$("tcard");await fly(c,type==="truth"?-1:1);
   if(S.apiKey&&!Q[type].length&&(pend[type]||prefetch(type))){c.className="card loading "+type;$("ttag").textContent="ИИ думает…";$("tq").textContent="";$("tsrc").textContent="";$("tChoose").hidden=true;enter(c);
     await Promise.race([pend[type],sleep(6000)])}
-  tcur=takeT(type)||pickTd(type);S.tdSeen.push(tcur.text);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetch(type);busyT=false;
+  tcur=Object.assign({},takeT(type)||pickTd(type));if(S.twists&&Math.random()<.2){const tw=TWISTS[type];tcur.twist=tw[Math.floor(Math.random()*tw.length)]}S.tdSeen.push(tcur.text);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetch(type);busyT=false;
 }
 async function result(done){
   if(busyT)return;busyT=true;const p=curP();const before=leader();
-  if(done){p.score++;vib(20)}else{p.score--;p.refuse++;vib([30,40,30]);toast("🙅 "+p.name+": −1 очко")}
+  if(done){p.score+=(tcur&&tcur.twist?tcur.twist.mult:1);vib(20)}else{p.score--;p.refuse++;vib([30,40,30]);toast("🙅 "+p.name+": −1 очко")}
   save();const after=leader();if(done&&after!==before&&after>=0){confetti();toast("👑 Лидирует "+S.players[after].name)}
   await fly($("tcard"),done?1:-1);
   if(S.rnd&&S.players.length>1){let n;do{n=Math.floor(Math.random()*S.players.length)}while(n===S.turn%S.players.length);S.turn=n}else S.turn=(S.turn+1)%S.players.length;
@@ -454,28 +493,31 @@ async function genN(n){
 }
 async function genT(type,n){
   const lv=S.level;const avoid=[...S.tdSeen.slice(-60),...Q[type].map(q=>q.text)].join("; ");
+  const ths=S.themes.map(t=>t+" — "+THEMES[t].name+": "+THEMES[t].desc).join("; ");
   const what=type==="truth"
     ?"вопросов «Правда» — личных вопросов, на которые игрок должен честно ответить вслух. Каждый — законченный вопрос со знаком вопроса"
     :"заданий «Действие» — коротких заданий, которые игрок выполняет прямо сейчас в комнате с друзьями, с телефоном под рукой. Каждое — повелительное предложение";
   const prompt=`Ты ведущий компанейской игры «Правда или действие» на русском языке.
 Сгенерируй ${n} ${what}.
+Распредели их примерно поровну между темами (у каждого укажи id темы): ${ths}.
 Уровень откровенности: «${LEVELS[lv].name}» — ${LEVELS[lv].desc}.
 Правила:
 - Обращайся к игроку на «ты», для слов с родом используй форму со скобками: «пробовал(а)», «готов(а)».
 - До 20 слов, конкретно, весело, без банальностей. Все варианты разные по теме.${type==="dare"?"\n- Только безопасные и выполнимые за 1–2 минуты задания: без алкоголя, без опасных трюков, без публикаций в соцсетях, без звонков и сообщений посторонним людям, без порчи вещей.":""}
 - Можно упоминать других игроков: «игрок слева», «игрок справа», «тот, кого выберет группа».
 - Не повторяй и не перефразируй уже использованные: ${avoid||"—"}
-Ответ — только JSON-массив строк.`;
+Ответ — только JSON-массив вида [{"text":"...","theme":"id"}].`;
   const arr=await callGemini(prompt);
-  return arr.map(o=>typeof o==="string"?o:(o&&o.text)).filter(Boolean).map(t=>({text:cleanT(t),type,level:lv,src:"ИИ"})).filter(o=>o.text.length>5);
+  return arr.map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
+    .map(o=>({text:cleanT(o.text),type,level:lv,theme:S.themes.includes(o.theme)?o.theme:S.themes[Math.floor(Math.random()*S.themes.length)],src:"ИИ"})).filter(o=>o.text.length>5);
 }
 function prefetch(k){
   if(!S.apiKey)return null;if(pend[k])return pend[k];if(Q[k].length>=6)return null;
-  const lvAt=S.level;
+  const lvAt=S.level+S.themes.join();
   pend[k]=(async()=>{try{
       const items=k==="n"?await genN(20):await genT(k,16);
       const seenArr=k==="n"?S.seen:S.tdSeen;const have=new Set([...seenArr,...Q[k].map(q=>q.text)].map(norm));
-      items.forEach(it=>{if(k!=="n"&&lvAt!==S.level)return;const h=norm(it.text);if(!have.has(h)){have.add(h);Q[k].push(it)}});
+      items.forEach(it=>{if(k!=="n"&&lvAt!==S.level+S.themes.join())return;const h=norm(it.text);if(!have.has(h)){have.add(h);Q[k].push(it)}});
       for(let i=Q[k].length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[Q[k][i],Q[k][j]]=[Q[k][j],Q[k][i]]}
       aiError=""}
     catch(e){aiError=e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google":(e.message||"ошибка сети")}
