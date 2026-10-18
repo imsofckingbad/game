@@ -80,6 +80,11 @@ input:focus{border-color:var(--acc)}
 .plist{display:flex;flex-wrap:wrap;gap:8px}
 .pchip{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-weight:700;font-size:14px;animation:pop .3s ease}
 .pchip .av{width:32px;height:32px;font-size:16px}
+.gb{width:34px;height:34px;border-radius:50%;font-size:16px;font-weight:800;background:rgba(255,255,255,.08);flex:none}
+.gb.m{color:#60a5fa;background:rgba(96,165,250,.16)}.gb.f{color:#f472b6;background:rgba(244,114,182,.16)}.gb.u{color:#facc15;background:rgba(250,204,21,.16)}
+.gsel{display:flex;gap:4px;background:rgba(0,0,0,.25);border-radius:14px;padding:4px;flex:none}
+.gsel button{width:42px;height:42px;border-radius:10px;font-size:18px;font-weight:800;color:var(--muted)}
+.gsel button.on[data-g=m]{background:rgba(96,165,250,.25);color:#93c5fd}.gsel button.on[data-g=f]{background:rgba(244,114,182,.25);color:#f9a8d4}
 .pchip .x{width:28px;height:28px;border-radius:50%;color:var(--muted);font-size:13px}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 .muted{color:var(--muted);font-size:13px;line-height:1.4}
@@ -167,7 +172,7 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
   </div>
   <div class="glass box">
     <h2>Игроки</h2>
-    <div class="row"><input id="pname" placeholder="Имя игрока" maxlength="14" enterkeyhint="done"><button class="ib" id="padd" style="width:52px;height:50px;font-size:22px">＋</button></div>
+    <div class="row"><input id="pname" placeholder="Имя игрока" maxlength="14" enterkeyhint="done"><div class="gsel" id="gsel"><button data-g="m" aria-label="Парень">♂</button><button data-g="f" aria-label="Девушка">♀</button></div><button class="ib" id="padd" style="width:52px;height:50px;font-size:22px">＋</button></div>
     <div class="plist" id="plist"></div>
     <div class="muted" id="phelp"></div>
   </div>
@@ -289,12 +294,23 @@ const LS="nhie_v1";
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
-function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0,themes:["classic","funny","friends"],twists:true}}
+function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0,themes:["classic","funny","friends"],twists:true,newG:"m"}}
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s){const d=Object.assign(defaults(),s);d.players.forEach((p,i)=>{p.color=p.color||COLORS[i%COLORS.length];p.refuse=p.refuse||0;p.score=p.score||0});return d}}catch(e){}return defaults()}
 let S=load();
 function save(){try{if(S.seen.length>3000)S.seen=S.seen.slice(-3000);if(S.tdSeen.length>3000)S.tdSeen=S.tdSeen.slice(-3000);localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 const norm=t=>String(t).toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
-const Q={n:[],truth:[],dare:[]},pend={n:null,truth:null,dare:null};
+const Q={n:[],td:{}},pend={n:null};
+const tq=g=>Q.td[g]||(Q.td[g]={truth:[],dare:[]});
+function resetTD(){Q.td={}}
+const G=p=>p&&(p.g==="m"||p.g==="f")?p.g:"x";
+const GN={m:"парень",f:"девушка",x:"игрок"};
+function genderize(t,g){if(g!=="m"&&g!=="f")return t;if(/\((ая|ую|ей|ий|ого|твой|твоя)\)|\(твой|\(твоя/.test(t))return t;const f=g==="f";
+  return t.replace(/([А-Яа-яЁё]+)ся\(ась\)/g,(_,a)=>f?a+"ась":a+"ся").replace(/([А-Яа-яЁё]+)ся\(лась\)/g,(_,a)=>f?a+"лась":a+"ся")
+   .replace(/([А-Яа-яЁё]+)ым\(ой\)/g,(_,a)=>f?a+"ой":a+"ым").replace(/один\(одна\)/g,f?"одна":"один").replace(/([А-Яа-яЁё]*)ёл\(шла\)/g,(_,a)=>f?a+"ла":a+"ёл")
+   .replace(/([А-Яа-яЁё]+)ён\(а\)/g,(_,a)=>f?a+"ена":a+"ён").replace(/([А-Яа-яЁё]+)ен\(на\)/g,(_,a)=>f?a+"на":a+"ен").replace(/([А-Яа-яЁё]+)\(ла\)/g,(_,a)=>f?a+"ла":a)
+   .replace(/([А-Яа-яЁё]+)\(а\)/g,(_,a)=>f?a+"а":a)}
+function groupLine(){const m=S.players.filter(p=>p.g==="m").length,f=S.players.filter(p=>p.g==="f").length;if(!m&&!f)return "";
+  return "\nСостав компании: "+[m?m+" "+(m===1?"парень":m<5?"парня":"парней"):"",f?f+" "+(f===1?"девушка":f<5?"девушки":"девушек"):""].filter(Boolean).join(" и ")+". Учитывай это: вопросы должны подходить именно такой компании."}
 let aiError="",cur=null,tcur=null,tPhase="choose",marks=new Set(),tmr=null;
 const vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 
@@ -314,7 +330,10 @@ function renderHome(){
   const pl=$("plist");pl.innerHTML="";
   S.players.forEach((p,i)=>{const d=document.createElement("div");d.className="pchip";const n=document.createElement("span");n.textContent=p.name;
     const x=document.createElement("button");x.className="x";x.textContent="✕";x.onclick=()=>{S.players.splice(i,1);if(S.turn>=S.players.length)S.turn=0;save();renderHome()};
-    d.append(avatar(p),n,x);pl.append(d)});
+    const gb=document.createElement("button");gb.className="gb "+(p.g==="f"?"f":p.g==="m"?"m":"u");gb.textContent=p.g==="f"?"♀":p.g==="m"?"♂":"?";gb.title="Пол игрока";
+    gb.onclick=()=>{p.g=p.g==="m"?"f":"m";resetTD();save();vib(8);renderHome()};
+    d.append(avatar(p),n,gb,x);pl.append(d)});
+  document.querySelectorAll("#gsel button").forEach(b=>b.classList.toggle("on",b.dataset.g===S.newG));
   $("phelp").textContent=S.mode==="td"?(S.players.length<2?"Для «Правды или действия» нужно минимум 2 игрока.":"Ходят по очереди, начиная с первого."):"Можно играть и без игроков — просто листать вопросы.";
   const ch=$("chips");ch.innerHTML="";
   Object.keys(CATS).forEach(c=>{const b=document.createElement("button");b.className="chip"+(c==="adult"?" hot":"")+(S.cats.includes(c)?" on":"");b.textContent=CATS[c];
@@ -323,24 +342,25 @@ function renderHome(){
       Q.n=Q.n.filter(q=>S.cats.includes(q.cat));save();renderHome()};ch.append(b)});
   const lv=$("levels");lv.innerHTML="";
   Object.keys(LEVELS).forEach(l=>{const b=document.createElement("button");b.textContent=LEVELS[l].name;b.className=(S.level===l?"on":"")+(l==="hot"?" hot":"");
-    b.onclick=()=>{if(l==="hot"&&S.level!=="hot"&&!confirm("Включить жаркий уровень 18+? Только для взрослых и с согласия всех."))return;S.level=l;Q.truth=[];Q.dare=[];save();renderHome()};lv.append(b)});
+    b.onclick=()=>{if(l==="hot"&&S.level!=="hot"&&!confirm("Включить жаркий уровень 18+? Только для взрослых и с согласия всех."))return;S.level=l;resetTD();save();renderHome()};lv.append(b)});
   const tc=$("themes");tc.innerHTML="";
   Object.keys(THEMES).forEach(t=>{const b=document.createElement("button");b.className="chip"+(S.themes.includes(t)?" on":"");b.textContent=THEMES[t].e+" "+THEMES[t].name;
     b.onclick=()=>{if(S.themes.includes(t)){if(S.themes.length>1)S.themes=S.themes.filter(x=>x!==t);else{toast("Нужен хотя бы один режим");return}}else S.themes.push(t);
-      Q.truth=[];Q.dare=[];save();vib(8);renderHome()};tc.append(b)});
+      resetTD();save();vib(8);renderHome()};tc.append(b)});
   $("rndSw").classList.toggle("on",S.rnd);$("twSw").classList.toggle("on",S.twists);
   $("aiDot").classList.toggle("on",!!S.apiKey);
   $("aiInfo").textContent=S.apiKey?"Включена · Gemini придумывает новые вопросы":"Выключена · играем на встроенной базе. Нажми, чтобы добавить ключ";
 }
-document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;save();vib(8);renderHome()});
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;save();vib(8);renderHome();if(S.mode==="td")warmTD();else prefetch("n")});
 $("rndSw").onclick=()=>{S.rnd=!S.rnd;save();renderHome()};
 $("twSw").onclick=()=>{S.twists=!S.twists;save();renderHome()};
+document.querySelectorAll("#gsel button").forEach(b=>b.onclick=()=>{S.newG=b.dataset.g;save();vib(8);renderHome()});
 function addPlayer(){const n=$("pname").value.trim();if(!n)return;if(S.players.length>=12){toast("Максимум 12 игроков");return}
-  const i=S.players.length;S.players.push({name:n,emoji:EMO[i%EMO.length],color:COLORS[i%COLORS.length],score:0,refuse:0});$("pname").value="";save();vib(8);renderHome();$("pname").focus()}
+  const i=S.players.length;S.players.push({name:n,g:S.newG,emoji:EMO[i%EMO.length],color:COLORS[i%COLORS.length],score:0,refuse:0});$("pname").value="";save();vib(8);renderHome();$("pname").focus()}
 $("padd").onclick=addPlayer;$("pname").onkeydown=e=>{if(e.key==="Enter")addPlayer()};
 $("start").onclick=()=>{
   if(S.mode==="td"){if(S.players.length<2){toast("Добавь хотя бы двух игроков");$("pname").focus();return}
-    show("td");S.turn%=S.players.length;if(tPhase==="task"&&tcur)renderTask(false);else renderChoose(false);prefetch("truth");prefetch("dare")}
+    show("td");S.turn%=S.players.length;if(tPhase==="task"&&tcur)renderTask(false);else renderChoose(false);warmTD()}
   else{show("game");renderPlayers();if(!cur||!S.cats.includes(cur.cat))nextN(false);else{renderCard(false);startTimer()}}
 };
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{stopTimer();show("home");renderHome()});
@@ -399,15 +419,15 @@ function curP(){return S.players[S.turn%S.players.length]}
 function renderTurn(){const p=curP();const a=$("tAv");a.replaceWith(Object.assign(avatar(p),{id:"tAv"}));$("tName").textContent=p.name;$("tSc").innerHTML="";const s=document.createElement("div");s.textContent="⭐ "+p.score;const r=document.createElement("div");r.textContent="🙅 "+p.refuse;$("tSc").append(s,r)}
 function renderChoose(anim=true){tPhase="choose";const c=$("tcard");c.className="card";c.classList.remove("loading");renderTurn();
   $("ttag").textContent="Твой выбор";$("tsrc").textContent=LEVELS[S.level].name;setWords($("tq"),curP().name+", правда или действие?");$("tnum").textContent="Раунд "+(S.tcount+1);
-  $("tChoose").hidden=false;$("tResult").hidden=true;if(anim)enter(c);renderStatus()}
+  $("tChoose").hidden=false;$("tResult").hidden=true;if(anim)enter(c);prefetchTD(G(curP()));renderStatus()}
 function themeName(t){return THEMES[t]?THEMES[t].e+" "+THEMES[t].name:""}
 function renderTask(anim=true){tPhase="task";const c=$("tcard");c.className="card "+tcur.type+(tcur.twist?" twist":"");renderTurn();
   $("ttag").textContent=(tcur.type==="truth"?"ПРАВДА":"ДЕЙСТВИЕ")+(tcur.twist?" · "+tcur.twist.label:"");
-  $("tsrc").textContent=tcur.src==="ИИ"?"✨ ИИ":"📚 база";setWords($("tq"),tcur.text);
+  $("tsrc").textContent=tcur.src==="ИИ"?"✨ ИИ":"📚 база";setWords($("tq"),genderize(tcur.text,G(curP())));
   const isTest=tcur.theme==="test";const notes=[];if(isTest)notes.push(tcur.type==="truth"?TEST_NOTE:TEST_NOTE_D);if(tcur.twist)notes.push(tcur.twist.note);
   $("ttw").hidden=!notes.length;$("ttw").textContent=notes.join("\n");
   $("tnum").textContent="Раунд "+S.tcount+" · "+themeName(tcur.theme)+" · "+LEVELS[tcur.level].name;
-  const m=tcur.twist?tcur.twist.mult:1;$("bDone").textContent=isTest?"💚 Зелёный +"+m:"Выполнил(а) +"+m;$("bRef").textContent=isTest?"🚩 Красный":"Отказ −1";
+  const m=tcur.twist?tcur.twist.mult:1;$("bDone").textContent=isTest?"💚 Зелёный +"+m:genderize("Выполнил(а)",G(curP()))+" +"+m;$("bRef").textContent=isTest?"🚩 Красный":"Отказ −1";
   $("tChoose").hidden=true;$("tResult").hidden=false;if(anim)enter(c);renderStatus()}
 function bankTd(type){const out=[];const lv=LEVEL_POOL[S.level];
   S.themes.forEach(th=>{if(th==="classic")lv.forEach((l,k)=>TD[type][l].forEach(t=>{for(let w=0;w<(k===0?3:1);w++)out.push({text:t,type,level:l,theme:"classic",src:"база"})}));
@@ -417,13 +437,14 @@ function bankTd(type){const out=[];const lv=LEVEL_POOL[S.level];
 function pickTd(type){const seen=new Set(S.tdSeen.map(norm));const all=bankTd(type);let pool=all.filter(o=>!seen.has(norm(o.text)));
   if(!pool.length){const ks=new Set(all.map(o=>norm(o.text)));S.tdSeen=S.tdSeen.filter(t=>!ks.has(norm(t)));save();pool=all}
   return pool[Math.floor(Math.random()*pool.length)]}
-function takeT(type){while(Q[type].length){const c=Q[type].shift();if(c.level===S.level&&S.themes.includes(c.theme))return c}return null}
+function takeT(type,g){const q=tq(g)[type];while(q.length){const c=q.shift();if(c.level===S.level&&S.themes.includes(c.theme))return c}return null}
 let busyT=false;
 async function choose(type){
   if(busyT)return;busyT=true;vib(10);const c=$("tcard");await fly(c,type==="truth"?-1:1);
-  if(S.apiKey&&!Q[type].length&&(pend[type]||prefetch(type))){c.className="card loading "+type;$("ttag").textContent="ИИ думает…";$("tq").textContent="";$("tsrc").textContent="";$("tChoose").hidden=true;enter(c);
-    await Promise.race([pend[type],sleep(6000)])}
-  tcur=Object.assign({},takeT(type)||pickTd(type));if(S.twists&&Math.random()<.2){const tw=TWISTS[type];tcur.twist=tw[Math.floor(Math.random()*tw.length)]}S.tdSeen.push(tcur.text);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetch(type);busyT=false;
+  const g=G(curP());
+  if(S.apiKey&&!tq(g)[type].length&&pend["td_"+g]){c.className="card loading "+type;$("ttag").textContent="ИИ думает…";$("tq").textContent="";$("tsrc").textContent="";$("tChoose").hidden=true;enter(c);
+    await Promise.race([pend["td_"+g],sleep(1500)])}
+  tcur=Object.assign({},takeT(type,g)||pickTd(type));if(S.twists&&Math.random()<.2){const tw=TWISTS[type];tcur.twist=tw[Math.floor(Math.random()*tw.length)]}S.tdSeen.push(tcur.text);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetchTD(g);busyT=false;
 }
 async function result(done){
   if(busyT)return;busyT=true;const p=curP();const before=leader();
@@ -441,10 +462,10 @@ $("bDone").onclick=()=>result(true);$("bRef").onclick=()=>result(false);
 function renderStatus(){
   [["st1","n"],["st2",null]].forEach(([id,k])=>{const s=$(id);s.className="status";
     if(!S.apiKey){s.textContent="📚 Встроенная база";return}
-    const ld=k?pend[k]:(pend.truth||pend.dare);
+    const gq=S.players.length?tq(G(curP())):{truth:[],dare:[]};const ld=k?pend[k]:Object.keys(pend).some(x=>x.startsWith("td_")&&pend[x]);
     if(ld){s.innerHTML='<span class="spin"></span>ИИ придумывает…';return}
     if(aiError){s.textContent="⚠️ "+aiError;s.classList.add("err");return}
-    s.textContent=k?"✨ В запасе: "+Q.n.length:"✨ Правд: "+Q.truth.length+" · Действий: "+Q.dare.length});
+    s.textContent=k?"✨ В запасе: "+Q.n.length:"✨ Правд: "+gq.truth.length+" · Действий: "+gq.dare.length});
 }
 
 /* ---------- AI (Gemini) ---------- */
@@ -467,17 +488,23 @@ async function listModels(){
   if(S.model&&c.includes(S.model))c=[S.model,...c.filter(x=>x!==S.model)];
   MODELS=c.slice(0,8);return MODELS;
 }
+function thinkCfg(model){if(/gemini-2\.5/.test(model))return /pro/.test(model)?{thinkingBudget:128}:{thinkingBudget:0};if(/gemini-[3-9]/.test(model))return {thinkingLevel:/pro/.test(model)?"low":"minimal"};return null}
 async function callGemini(prompt){
   const models=await listModels();let lastErr=null;
   for(const model of models){
-    const r=await fetch(API+model+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.apiKey},
-      body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:1.1,responseMimeType:"application/json"}})});
-    const j=await r.json().catch(()=>({}));
-    if(r.ok){if(S.model!==model){S.model=model;save()}
-      const txt=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("");
-      let arr;try{arr=JSON.parse(txt)}catch(e){const m=txt.match(/\[[\s\S]*\]/);try{arr=m?JSON.parse(m[0]):[]}catch(_){arr=[]}}
-      return Array.isArray(arr)?arr:[]}
-    lastErr=new Error(errText(r.status,j));if(r.status===401||r.status===403)throw lastErr;
+    let tc=thinkCfg(model);
+    for(let attempt=0;attempt<2;attempt++){
+      const gc={temperature:1.1,responseMimeType:"application/json"};if(tc)gc.thinkingConfig=tc;
+      const r=await fetch(API+model+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.apiKey},
+        body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:gc})});
+      const j=await r.json().catch(()=>({}));
+      if(r.ok){if(S.model!==model){S.model=model;save()}
+        const txt=(j.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||"").join("");
+        try{return JSON.parse(txt)}catch(e){const m=txt.match(/[\[{][\s\S]*[\]}]/);try{return m?JSON.parse(m[0]):[]}catch(_){return []}}}
+      lastErr=new Error(errText(r.status,j));if(r.status===401||r.status===403)throw lastErr;
+      if(r.status===400&&tc){tc=null;continue}
+      break;
+    }
   }
   throw lastErr||new Error("Все модели сейчас заняты");
 }
@@ -485,7 +512,7 @@ function cleanN(t){return String(t).trim().replace(/^я\s+никогда\s+не\
 function cleanT(t){return String(t).trim().replace(/^(правда|действие)\s*[:\-—]\s*/i,"").replace(/^[«"]|[»"]$/g,"").replace(/^./,c=>c.toUpperCase())}
 async function genN(n){
   const cats=S.cats.map(c=>c+" — "+CATS[c]).join(", ");
-  const avoid=[...S.seen.slice(-80),...Q.n.map(q=>q.text)].join("; ");
+  const avoid=[...S.seen.slice(-50),...Q.n.map(q=>q.text)].join("; ");
   const prompt=`Ты придумываешь утверждения для компанейской игры «Я никогда не…» на русском языке.
 Сгенерируй ${n} новых утверждений. Категории (распредели примерно поровну, у каждого укажи id категории): ${cats}.
 Правила:
@@ -493,39 +520,57 @@ async function genN(n){
 - Глагол в прошедшем времени с женской формой в скобках: «прыгал(а) с парашютом», «терялся(ась) в лесу».
 - До 12 слов, конкретно, живо, с юмором. Выбирай то, что делала заметная часть людей (примерно 20–60%), чтобы было интересно признаваться.
 - Все утверждения разные по теме, без повторов и перефразирования друг друга.${S.cats.includes("test")?"\n- Для категории test: провокационные признания про отношения — бывшие, ревность, тайны от партнёра, соблазны, доверие, проверки телефона. Острые, но без грубостей.":""}${S.cats.includes("adult")?"\n- Для категории adult: откровенно и с флиртом, но без грубостей, без подробных описаний секса и без насилия.":""}
-- Не повторяй и не перефразируй уже использованные: ${avoid||"—"}
+- Не повторяй и не перефразируй уже использованные: ${avoid||"—"}${groupLine()}
 Ответ — только JSON-массив вида [{"text":"...","cat":"id"}].`;
-  const arr=await callGemini(prompt);
+  let arr=await callGemini(prompt);if(!Array.isArray(arr))arr=Object.values(arr||{}).find(Array.isArray)||[];
   return arr.map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
     .map(o=>({text:cleanN(o.text),cat:S.cats.includes(o.cat)?o.cat:S.cats[Math.floor(Math.random()*S.cats.length)],src:"ИИ"})).filter(o=>o.text.length>3);
 }
-async function genT(type,n){
-  const lv=S.level;const avoid=[...S.tdSeen.slice(-60),...Q[type].map(q=>q.text)].join("; ");
+async function genTD(g,n){
+  const lv=S.level;const q=tq(g);const avoid=[...S.tdSeen.slice(-40),...q.truth.map(x=>x.text),...q.dare.map(x=>x.text)].join("; ");
   const ths=S.themes.map(t=>t+" — "+THEMES[t].name+": "+THEMES[t].desc).join("; ");
-  const what=type==="truth"
-    ?"вопросов «Правда» — личных вопросов, на которые игрок должен честно ответить вслух. Каждый — законченный вопрос со знаком вопроса"
-    :"заданий «Действие» — коротких заданий, которые игрок выполняет прямо сейчас в комнате с друзьями, с телефоном под рукой. Каждое — повелительное предложение";
+  const who=g==="m"?"Вопросы и задания для ПАРНЯ. Пиши глаголы и прилагательные в мужском роде без скобок («пробовал», «готов», «сам»). Если речь о второй половинке или бывших — по умолчанию это девушка («твоя девушка», «твоя бывшая»)."
+    :g==="f"?"Вопросы и задания для ДЕВУШКИ. Пиши глаголы и прилагательные в женском роде без скобок («пробовала», «готова», «сама»). Если речь о второй половинке или бывших — по умолчанию это парень («твой парень», «твой бывший»)."
+    :"Пол игрока неизвестен: для слов с родом используй форму со скобками: «пробовал(а)», «готов(а)».";
+  const test=S.themes.includes("test")?"\n- Для темы test: правда — острая правдоподобная жизненная ситуация-проверка (бывшие, ревность, соблазны, доверие, выбор между второй половинкой и другими) в 1–2 предложениях, до 35 слов, заканчивается вопросом вроде «Твои действия?»; действие — проверка доверия и знания второй половинки, без унижения и без сообщений бывшим.":"";
   const prompt=`Ты ведущий компанейской игры «Правда или действие» на русском языке.
-Сгенерируй ${n} ${what}.
-Распредели их примерно поровну между темами (у каждого укажи id темы): ${ths}.
+Сгенерируй ${n} вопросов «Правда» и ${n} заданий «Действие».
+«Правда» — личный вопрос, на который игрок честно отвечает вслух, со знаком вопроса. «Действие» — короткое задание, которое игрок выполняет прямо сейчас в комнате с друзьями, с телефоном под рукой.
+Распредели по темам примерно поровну (у каждого укажи id темы): ${ths}.
 Уровень откровенности: «${LEVELS[lv].name}» — ${LEVELS[lv].desc}.
+${who}${groupLine()}
 Правила:
-- Обращайся к игроку на «ты», для слов с родом используй форму со скобками: «пробовал(а)», «готов(а)».
-- До 20 слов, конкретно, весело, без банальностей. Все варианты разные по теме.${S.themes.includes("test")?(type==="truth"?"\n- Для темы test: острая, правдоподобная жизненная ситуация-проверка (бывшие, ревность, соблазны, доверие, выбор между партнёром и другими) в 1–2 предложениях, до 35 слов, заканчивается вопросом вроде «Твои действия?». Слово «партнёр» вместо имён.":"\n- Для темы test: задания, проверяющие доверие и знание партнёра или отношение к бывшим, без унижения и без отправки сообщений бывшим."):""}${type==="dare"?"\n- Только безопасные и выполнимые за 1–2 минуты задания: без алкоголя, без опасных трюков, без публикаций в соцсетях, без звонков и сообщений посторонним людям, без порчи вещей.":""}
+- Обращайся на «ты». До 20 слов, конкретно, весело, без банальностей, все варианты разные.${test}
+- Действия только безопасные, на 1–2 минуты: без алкоголя, опасных трюков, публикаций в соцсетях, звонков и сообщений посторонним, порчи вещей.
 - Можно упоминать других игроков: «игрок слева», «игрок справа», «тот, кого выберет группа».
-- Не повторяй и не перефразируй уже использованные: ${avoid||"—"}
-Ответ — только JSON-массив вида [{"text":"...","theme":"id"}].`;
-  const arr=await callGemini(prompt);
-  return arr.map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
-    .map(o=>({text:cleanT(o.text),type,level:lv,theme:S.themes.includes(o.theme)?o.theme:S.themes[Math.floor(Math.random()*S.themes.length)],src:"ИИ"})).filter(o=>o.text.length>5);
+- Не повторяй уже использованные: ${avoid||"—"}
+Ответ — только JSON вида {"truth":[{"text":"...","theme":"id"}],"dare":[{"text":"...","theme":"id"}]}.`;
+  const res=await callGemini(prompt);
+  const fix=(arr,type)=>(Array.isArray(arr)?arr:[]).map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
+    .map(o=>({text:cleanT(o.text),type,level:lv,g,theme:S.themes.includes(o.theme)?o.theme:S.themes[Math.floor(Math.random()*S.themes.length)],src:"ИИ"})).filter(o=>o.text.length>5);
+  return {truth:fix(res&&res.truth,"truth"),dare:fix(res&&res.dare,"dare")};
 }
+function prefetchTD(g){
+  const k="td_"+g;if(!S.apiKey)return null;if(pend[k])return pend[k];const q=tq(g);if(q.truth.length>=4&&q.dare.length>=4)return null;
+  const sig=S.level+S.themes.join()+groupLine();const n=(q.truth.length+q.dare.length)<2?5:10;
+  pend[k]=(async()=>{try{
+      const r=await genTD(g,n);if(sig!==S.level+S.themes.join()+groupLine())return;
+      const have=new Set([...S.tdSeen,...q.truth.map(x=>x.text),...q.dare.map(x=>x.text)].map(norm));
+      ["truth","dare"].forEach(t=>{r[t].forEach(it=>{const h=norm(it.text);if(!have.has(h)){have.add(h);tq(g)[t].push(it)}});const a=tq(g)[t];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}});
+      aiError=""}
+    catch(e){aiError=e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google":(e.message||"ошибка сети")}
+    finally{pend[k]=null;renderStatus();const q2=tq(g);if(!aiError&&(q2.truth.length<2||q2.dare.length<2)&&sig===S.level+S.themes.join()+groupLine())setTimeout(()=>prefetchTD(g),300)}})();
+  renderStatus();return pend[k];
+}
+function warmTD(){if(!S.apiKey||!S.players.length)return;const cur=G(curP());prefetchTD(cur);
+  [...new Set(S.players.map(G))].filter(x=>x!==cur).forEach((g,i)=>setTimeout(()=>prefetchTD(g),800*(i+1)))}
 function prefetch(k){
   if(!S.apiKey)return null;if(pend[k])return pend[k];if(Q[k].length>=6)return null;
   const lvAt=S.level+S.themes.join();
   pend[k]=(async()=>{try{
-      const items=k==="n"?await genN(20):await genT(k,16);
+      const items=await genN(Q.n.length<2?10:20);
       const seenArr=k==="n"?S.seen:S.tdSeen;const have=new Set([...seenArr,...Q[k].map(q=>q.text)].map(norm));
-      items.forEach(it=>{if(k!=="n"&&lvAt!==S.level+S.themes.join())return;const h=norm(it.text);if(!have.has(h)){have.add(h);Q[k].push(it)}});
+      items.forEach(it=>{const h=norm(it.text);if(!have.has(h)){have.add(h);Q[k].push(it)}});
       for(let i=Q[k].length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[Q[k][i],Q[k][j]]=[Q[k][j],Q[k][i]]}
       aiError=""}
     catch(e){aiError=e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google":(e.message||"ошибка сети")}
@@ -537,7 +582,7 @@ function prefetch(k){
 function openSet(){stopTimer();$("key").value=S.apiKey;$("timer").value=S.timer;$("keyRes").textContent=S.model?"Модель: "+S.model.replace("models/",""):"";$("mSet").classList.add("open")}
 document.querySelectorAll("[data-set]").forEach(b=>b.onclick=openSet);$("aiBtn").onclick=openSet;
 $("keyShow").onclick=()=>{const k=$("key");k.type=k.type==="password"?"text":"password"};
-$("key").onchange=()=>{const v=$("key").value.trim();if(v!==S.apiKey){S.apiKey=v;S.model="";MODELS=null;Q.n=[];Q.truth=[];Q.dare=[];aiError="";save()}};
+$("key").onchange=()=>{const v=$("key").value.trim();if(v!==S.apiKey){S.apiKey=v;S.model="";MODELS=null;Q.n=[];resetTD();aiError="";save()}};
 $("keyTest").onclick=async()=>{$("key").onchange();if(!S.apiKey){$("keyRes").textContent="Вставь ключ";return}
   $("keyRes").innerHTML='<span class="spin"></span>Проверяю…';
   try{const it=await genN(5);Q.n.push(...it);aiError="";$("keyRes").textContent="✅ Работает! Модель: "+S.model.replace("models/","")+". Пример: «Я никогда не "+(it[0]?.text||"…")+"»"}
@@ -546,7 +591,7 @@ $("timer").onchange=()=>{S.timer=+$("timer").value;save()};
 $("resetSeen").onclick=()=>{if(confirm("Сбросить историю показанных вопросов и заданий?")){S.seen=[];S.tdSeen=[];S.count=0;S.tcount=0;save();toast("История сброшена")}};
 $("resetScore").onclick=()=>{if(!confirm("Обнулить очки всех игроков?"))return;S.players.forEach(p=>{p.score=0;p.refuse=0;p.redflags=0});S.turn=0;save();renderPlayers();if($("td").classList.contains("active"))renderTurn();toast("Счёт обнулён")};
 $("setClose").onclick=()=>{$("key").onchange();$("mSet").classList.remove("open");renderHome();renderStatus();if($("game").classList.contains("active"))startTimer();
-  if(S.mode==="td"){prefetch("truth");prefetch("dare")}else prefetch("n")};
+  if(S.mode==="td")warmTD();else prefetch("n")};
 document.querySelectorAll("[data-lb]").forEach(b=>b.onclick=()=>{
   const l=$("lbList");l.innerHTML="";const ps=[...S.players].sort((a,b)=>b.score-a.score);const mx=Math.max(1,...ps.map(p=>p.score));
   $("lbTitle").textContent=S.mode==="td"?"🏆 Самый смелый":"🏆 Самый опытный";
@@ -568,6 +613,7 @@ try{const cv=document.createElement("canvas");cv.width=cv.height=180;const x=cv.
   x.font="110px serif";x.textAlign="center";x.textBaseline="middle";x.fillText("🔥",90,98);$("ati").href=cv.toDataURL("image/png")}catch(e){}
 
 renderHome();
+if(S.apiKey){listModels().then(()=>{if(S.mode==="td")warmTD();else prefetch("n")}).catch(()=>{})}
 </script>
 </body>
 </html>
