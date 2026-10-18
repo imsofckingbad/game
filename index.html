@@ -127,6 +127,9 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
 @keyframes shimmer{to{background-position:-200% 0}}
 .card.twist{box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 2px #facc15 inset,0 -40px 80px -50px var(--cardc) inset}
 .tw{white-space:pre-line;font-weight:800;font-size:14px;line-height:1.35;padding:10px 12px;border-radius:14px;background:rgba(250,204,21,.14);color:#fde68a}
+.foot{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:auto}.foot .num{margin-top:0}
+.bad{position:relative;z-index:3;flex:none;height:38px;padding:0 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--muted)}
+.bad:active{transform:scale(.94)}
 .hint{font-size:13px;color:var(--muted);font-weight:700;text-align:center}
 .avs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .pb{display:flex;flex-direction:column;align-items:center;gap:5px;width:64px;font-size:12px;font-weight:700;color:var(--muted)}
@@ -197,7 +200,7 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
   <div class="top"><button class="ib" data-back>←</button><div class="status" id="st1"></div><button class="ib" data-lb>🏆</button><button class="ib" data-set>⚙️</button></div>
   <div class="timerbar" id="tbar" hidden><i id="tfill"></i></div>
   <div class="stack"><div class="ghost g2"></div><div class="ghost g1"></div>
-    <div class="card" id="card"><span class="tag" id="tag"></span><span class="src" id="src"></span><div class="prefix">Я никогда не…</div><div class="q" id="q"></div><div class="tw" id="ntw" hidden></div><div class="num" id="num"></div></div>
+    <div class="card" id="card"><span class="tag" id="tag"></span><span class="src" id="src"></span><div class="prefix">Я никогда не…</div><div class="q" id="q"></div><div class="tw" id="ntw" hidden></div><div class="foot"><div class="num" id="num"></div><button class="bad" id="nbad" title="Бред или повтор — убрать">👎 Повтор/бред</button></div></div>
   </div>
   <div class="hint" id="phint">Отметь, кто это делал 👇</div>
   <div class="avs" id="pgrid"></div>
@@ -209,7 +212,7 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
   <div class="top"><button class="ib" data-back>←</button><div class="status" id="st2"></div><button class="ib" data-lb>🏆</button><button class="ib" data-set>⚙️</button></div>
   <div class="glass turn"><div class="av" id="tAv"></div><div><small>Ходит</small><b id="tName"></b></div><div class="sc" id="tSc"></div></div>
   <div class="stack"><div class="ghost g2"></div><div class="ghost g1"></div>
-    <div class="card" id="tcard"><span class="tag" id="ttag"></span><span class="src" id="tsrc"></span><div class="q" id="tq"></div><div class="tw" id="ttw" hidden></div><div class="num" id="tnum"></div></div>
+    <div class="card" id="tcard"><span class="tag" id="ttag"></span><span class="src" id="tsrc"></span><div class="q" id="tq"></div><div class="tw" id="ttw" hidden></div><div class="foot"><div class="num" id="tnum"></div><button class="bad" id="tbad" hidden title="Бред или повтор — заменить">👎 Повтор/бред</button></div></div>
   </div>
   <div class="dock" id="tChoose"><button class="btn truth" id="bTruth">Правда</button><button class="btn dare" id="bDare">Действие</button></div>
   <div class="dock" id="tResult" hidden><button class="btn soft" id="bRef">Отказ −1</button><button class="btn main" id="bDone">Выполнил(а) +1</button></div>
@@ -222,6 +225,7 @@ box-shadow:0 30px 60px -25px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04) inse
   <div class="row"><input id="key" type="password" placeholder="AQ… или AIza…" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="ib" id="keyShow" style="width:52px;height:50px">👁</button></div>
   <button class="btn soft" id="keyTest">Проверить ключ</button>
   <div class="muted" id="keyRes"></div>
+  <div class="muted" id="dedupInfo"></div>
   <h2>Авто-смена вопроса («Я никогда не…»)</h2>
   <select id="timer"><option value="0">Выключено</option><option value="15">Каждые 15 сек</option><option value="30">Каждые 30 сек</option><option value="60">Каждые 60 сек</option></select>
   <button class="btn soft" id="resetSeen">Сбросить историю вопросов</button>
@@ -300,7 +304,7 @@ const LS="nhie_v1";
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
-function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0,themes:["classic","funny","friends"],twists:true,newG:"m"}}
+function defaults(){return{players:[],cats:["easy","funny","friends"],seen:[],tdSeen:[],apiKey:"",model:"",timer:0,count:0,tcount:0,mode:"nhie",level:"easy",rnd:false,turn:0,themes:["classic","funny","friends"],twists:true,newG:"m",ideas:[],bad:[]}}
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s){const d=Object.assign(defaults(),s);d.players.forEach((p,i)=>{p.color=p.color||COLORS[i%COLORS.length];p.refuse=p.refuse||0;p.score=p.score||0});return d}}catch(e){}return defaults()}
 let S=load();
 function save(){try{if(S.seen.length>3000)S.seen=S.seen.slice(-3000);if(S.tdSeen.length>3000)S.tdSeen=S.tdSeen.slice(-3000);localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
@@ -327,6 +331,61 @@ function confetti(){if(RM)return;const cs=["#ff8a3d","#ff3d7f","#8b5cf6","#2ee6c
     c.style.setProperty("--dx",(Math.random()*160-80)+"px");c.style.setProperty("--rot",(Math.random()*720-360)+"deg");c.style.animationDelay=Math.random()*.25+"s";document.body.append(c);setTimeout(()=>c.remove(),1900)}}
 function leader(){let b=-1,bi=-1;S.players.forEach((p,i)=>{if(p.score>b){b=p.score;bi=i}});return b>0?bi:-1}
 function setWords(el,text){el.innerHTML="";String(text).split(" ").forEach((w,i)=>{const s=document.createElement("span");s.className="w";s.textContent=w;s.style.animationDelay=(i*40)+"ms";el.append(s)})}
+
+/* ---------- DEDUPE ---------- */
+const STOPW=new Set("ты твой твоя твое твоё твои твоего твоей твоему тебя тебе тобой ли и в во на с со к ко по за из у о об от до что чем как если это эта этот или а но не ни же бы ещё еще уже когда кто где чтобы для его её ее их он она они мы вы я мне меня свой своя свои своего так то там тут при через после перед очень просто всё все весь вся был была было были будет будешь сделаешь скажешь действия поступишь реакция отреагируешь кого кому который которая которые есть нет да один одна одно какой какая какое какие сделать хочет хочешь никогда когда-нибудь".split(" "));
+function stems(t){const out=new Set();String(t||"").toLowerCase().replace(/ё/g,"е").replace(/\([^)]*\)/g,"").split(/[^a-zа-я0-9]+/).forEach(w=>{if(w.length<3||STOPW.has(w)||/^(партн|девуш|парен|парн|половин)/.test(w))return;out.add(/^бывш/.test(w)?"бывш":w.length>5?w.slice(0,5):w)});return out}
+function simSets(A,B){if(!A||!B||!A.size||!B.size)return null;let n=0;A.forEach(x=>{if(B.has(x))n++});return {n,j:n/(A.size+B.size-n),o:n/Math.min(A.size,B.size)}}
+let HIST=[];
+function mkH(text,idea){return {s:stems(text),i:idea?stems(idea):null}}
+function histAdd(text,idea){HIST.push(mkH(text,idea));if(HIST.length>900)HIST.shift()}
+function lexDup(h,list){for(const x of list){const r=simSets(h.s,x.s);if(r&&(r.j>=0.5||(r.o>=0.7&&r.n>=3)))return true;const q=simSets(h.i,x.i);if(q&&(q.j>=0.5||(q.o>=0.75&&q.n>=2)))return true}return false}
+function sane(it,type){const t=it.text;if(t.length<(type==="n"?6:12)||t.length>230)return false;if((t.match(/[a-z]{3,}/gi)||[]).length>2)return false;if((t.match(/\(/g)||[]).length!==(t.match(/\)/g)||[]).length)return false;
+  if(type==="truth"&&!/\?/.test(t))return false;const cnt={};if(t.toLowerCase().split(/[^a-zа-яё]+/).some(w=>w.length>=4&&(cnt[w]=(cnt[w]||0)+1)>=3))return false;if(it.score!=null&&+it.score<7)return false;return true}
+/* semantic (Gemini embeddings) */
+let EMB_MODEL=undefined,EMB=[],PEND_EMB=[];const SEM_TH=0.88;
+try{const raw=JSON.parse(localStorage.getItem(LS+"_emb")||"[]");EMB=raw.map(e=>({v:unpackV(e)}))}catch(e){EMB=[]}
+function packV(v){let m=0;for(const x of v)m=Math.max(m,Math.abs(x));const sc=m?127/m:1;const b=new Int8Array(v.length);v.forEach((x,i)=>b[i]=Math.round(x*sc));let str="";b.forEach(x=>str+=String.fromCharCode(x+128));return btoa(str)}
+function unpackV(s){const str=atob(s);const v=new Float32Array(str.length);for(let i=0;i<str.length;i++)v[i]=str.charCodeAt(i)-128;return nrm(v)}
+function nrm(v){let n=0;for(const x of v)n+=x*x;n=Math.sqrt(n)||1;const o=new Float32Array(v.length);for(let i=0;i<v.length;i++)o[i]=v[i]/n;return o}
+function dot(a,b){let s=0;const n=Math.min(a.length,b.length);for(let i=0;i<n;i++)s+=a[i]*b[i];return s}
+function embAdd(v){if(!v)return;EMB.push({v});if(EMB.length>700)EMB.shift();clearTimeout(embAdd.t);embAdd.t=setTimeout(()=>{try{localStorage.setItem(LS+"_emb",JSON.stringify(EMB.map(e=>packV(e.v))))}catch(e){}},500)}
+async function embed(texts){
+  if(!EMB_MODEL||!texts.length)return null;
+  const r=await fetch(API+EMB_MODEL+":batchEmbedContents",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.apiKey},
+    body:JSON.stringify({requests:texts.map(t=>({model:EMB_MODEL,content:{parts:[{text:t}]},taskType:"SEMANTIC_SIMILARITY"}))})});
+  if(!r.ok){if(r.status===400||r.status===404)EMB_MODEL=null;return null}
+  const j=await r.json().catch(()=>({}));const es=j.embeddings||[];if(es.length!==texts.length)return null;
+  return es.map(e=>nrm(Float32Array.from((e.values||[]).slice(0,256))))
+}
+function queueItems(){const a=[...Q.n];Object.values(Q.td).forEach(q=>{a.push(...q.truth,...q.dare)});return a}
+async function filterNew(items,type){
+  items=items.filter(it=>sane(it,type));
+  const hist=HIST.slice(),kept=[];
+  queueItems().forEach(q=>hist.push(q.h||mkH(q.text,q.idea)));
+  items.forEach(it=>{it.h=mkH(it.text,it.idea);if(!lexDup(it.h,hist)){kept.push(it);hist.push(it.h)}});
+  if(!EMB_MODEL||!kept.length)return kept;
+  const pend=PEND_EMB.splice(0,30);
+  let vecs=null;try{vecs=await embed([...pend,...kept.map(i=>i.text)])}catch(e){}
+  if(!vecs){PEND_EMB.unshift(...pend);return kept}
+  pend.forEach((t,k)=>embAdd(vecs[k]));
+  const pool=[...EMB.map(e=>e.v),...queueItems().filter(q=>q.vec).map(q=>q.vec)];
+  const scored=kept.map((it,k)=>{const v=vecs[pend.length+k];let mx=0;for(const u of pool){const c=dot(u,v);if(c>mx)mx=c}it.vec=v;return {it,mx}});
+  const out=[];scored.forEach(o=>{let mx=o.mx;for(const x of out){const c=dot(x.vec,o.it.vec);if(c>mx)mx=c}if(mx<SEM_TH)out.push(o.it)});
+  if(out.length<3&&kept.length>=6){scored.sort((a,b)=>a.mx-b.mx).slice(0,3).forEach(o=>{if(!out.includes(o.it)&&o.mx<0.93)out.push(o.it)})}
+  return out;
+}
+function markShown(it){histAdd(it.text,it.idea);if(it.idea){S.ideas.push(it.idea);if(S.ideas.length>300)S.ideas=S.ideas.slice(-300)}if(it.vec)embAdd(it.vec);else{PEND_EMB.push(it.text);if(PEND_EMB.length>60)PEND_EMB.shift()}}
+function initHist(){HIST=[];[...S.seen.slice(-300),...S.tdSeen.slice(-300)].forEach(t=>histAdd(t));S.ideas.slice(-300).forEach(i=>HIST.push({s:new Set(),i:stems(i)}))}
+initHist();
+function avoidLine(texts){const ideas=S.ideas.slice(-120);const parts=[];if(ideas.length)parts.push("Уже были идеи (не повторяй по СМЫСЛУ, даже другими словами): "+ideas.join("; "));if(texts.length)parts.push("Последние вопросы: "+texts.join("; "));
+  const bad=S.bad.slice(-10);if(bad.length)parts.push("Игрокам НЕ понравилось (бред или повтор) — не делай ничего похожего: "+bad.join("; "));return parts.join("\n")}
+const QUALITY=`Качество (самое важное):
+- Каждый пункт понятен с первого прочтения, грамматически правильный, звучит естественно, как сказал бы живой человек.
+- Правдоподобно: такое реально бывает в жизни. Без абсурда, фантастики и нелепых деталей (плохо: «Партнёр превратился в кота — ты бы его ревновал?»).
+- Каждый пункт — новая идея, а не пересказ другой. Сменить пару слов — это повтор.
+- Сначала мысленно придумай вдвое больше вариантов и оставь только лучшие.
+- У каждого пункта укажи "idea" — суть в 2–5 словах (например «бывшая просит ночной помощи») и "score" — твоя честная оценка, насколько вопрос интересный и жизненный, от 1 до 10.`;
 
 /* ---------- HOME ---------- */
 function renderHome(){
@@ -401,8 +460,9 @@ function pickBank(){
   if(!pool.length){const all=new Set();S.cats.forEach(c=>BANK[c].forEach(t=>all.add(norm(t))));S.seen=S.seen.filter(t=>!all.has(norm(t)));save();
     S.cats.forEach(c=>BANK[c].forEach(t=>pool.push({text:t,cat:c,src:"база"})));if(!S.apiKey)toast("Встроенные вопросы закончились — по кругу")}
   const fresh=pool.filter(o=>{const f=famOf(o.text);return f<0||!recentFam.includes(f)});if(fresh.length)pool=fresh;
-  return pool[Math.floor(Math.random()*pool.length)];
+  return pickNovel(pool);
 }
+function pickNovel(pool){const recent=HIST.slice(-150);for(let k=0;k<8;k++){const o=pool[Math.floor(Math.random()*pool.length)];if(!lexDup(mkH(o.text),recent))return o}return pool[Math.floor(Math.random()*pool.length)]}
 function takeN(){let i=Q.n.findIndex(c=>S.cats.includes(c.cat)&&!recentFam.includes(famOf(c.text)));if(i<0)i=Q.n.findIndex(c=>S.cats.includes(c.cat));if(i<0){Q.n.length=0;return null}return Q.n.splice(i,1)[0]}
 let busyN=false;
 async function nextN(anim=true){
@@ -410,11 +470,17 @@ async function nextN(anim=true){
   if(anim)await fly(card,-1);
   if(S.apiKey&&!Q.n.length&&(pend.n||prefetch("n"))){card.classList.add("loading");$("q").textContent="";$("tag").textContent="ИИ думает…";$("src").textContent="";enter(card);
     await Promise.race([pend.n,sleep(6000)]);card.classList.remove("loading")}
-  cur=takeN()||pickBank();marks=new Set();S.seen.push(cur.text);noteFam(cur.text);S.count++;save();
+  cur=takeN()||pickBank();marks=new Set();S.seen.push(cur.text);noteFam(cur.text);markShown(cur);S.count++;save();
   renderCard(true);renderPlayers();startTimer();prefetch("n");busyN=false;
 }
 function renderCard(anim){const card=$("card");card.classList.remove("loading");$("ntw").hidden=cur.cat!=="test";$("ntw").textContent="🚩 Кто признался — коротко объясняет, как так вышло. Остальные решают: простить или нет 👀";setWords($("q"),cur.text);$("tag").textContent=CATS[cur.cat];$("src").textContent=cur.src==="ИИ"?"✨ ИИ":"📚 база";$("num").textContent="Вопрос №"+S.count;if(anim!==false)enter(card);renderStatus()}
 $("next").onclick=()=>nextN();
+function markBad(it){if(!it)return;S.bad.push(it.text);if(S.bad.length>40)S.bad=S.bad.slice(-40);
+  const h=mkH(it.text,it.idea);const before=Q.n.length;Q.n=Q.n.filter(q=>!lexDup(q.h||mkH(q.text,q.idea),[h]));
+  Object.values(Q.td).forEach(q=>{q.truth=q.truth.filter(x=>!lexDup(x.h||mkH(x.text,x.idea),[h]));q.dare=q.dare.filter(x=>!lexDup(x.h||mkH(x.text,x.idea),[h]))});
+  if(it.vec){Q.n=Q.n.filter(q=>!q.vec||dot(q.vec,it.vec)<0.85);Object.values(Q.td).forEach(q=>{q.truth=q.truth.filter(x=>!x.vec||dot(x.vec,it.vec)<0.85);q.dare=q.dare.filter(x=>!x.vec||dot(x.vec,it.vec)<0.85)})}
+  save();vib(12);toast("👎 Убрал. ИИ учтёт и не будет делать похожее")}
+$("nbad").onclick=e=>{e.stopPropagation();if(busyN||!cur)return;cur.score=0;marks.forEach(i=>{S.players[i].score--});marks=new Set();S.count--;markBad(cur);nextN()};
 dragable($("card"),()=>{if(busyN)return false;setTimeout(()=>nextN(false),260)});
 function startTimer(){stopTimer();const t=+S.timer;$("tbar").hidden=!t;if(!t)return;
   const f=$("tfill");f.style.transition="none";f.style.width="0";void f.offsetWidth;f.style.transition="width "+t+"s linear";f.style.width="100%";
@@ -426,7 +492,7 @@ function curP(){return S.players[S.turn%S.players.length]}
 function renderTurn(){const p=curP();const a=$("tAv");a.replaceWith(Object.assign(avatar(p),{id:"tAv"}));$("tName").textContent=p.name;$("tSc").innerHTML="";const s=document.createElement("div");s.textContent="⭐ "+p.score;const r=document.createElement("div");r.textContent="🙅 "+p.refuse;$("tSc").append(s,r)}
 function renderChoose(anim=true){tPhase="choose";const c=$("tcard");c.className="card";c.classList.remove("loading");renderTurn();
   $("ttag").textContent="Твой выбор";$("tsrc").textContent=LEVELS[S.level].name;setWords($("tq"),curP().name+", правда или действие?");$("tnum").textContent="Раунд "+(S.tcount+1);
-  $("tChoose").hidden=false;$("tResult").hidden=true;if(anim)enter(c);prefetchTD(G(curP()));renderStatus()}
+  $("tChoose").hidden=false;$("tResult").hidden=true;$("tbad").hidden=true;$("ttw").hidden=true;if(anim)enter(c);prefetchTD(G(curP()));renderStatus()}
 function themeName(t){return THEMES[t]?THEMES[t].e+" "+THEMES[t].name:""}
 function renderTask(anim=true){tPhase="task";const c=$("tcard");c.className="card "+tcur.type+(tcur.twist?" twist":"");renderTurn();
   $("ttag").textContent=(tcur.type==="truth"?"ПРАВДА":"ДЕЙСТВИЕ")+(tcur.twist?" · "+tcur.twist.label:"");
@@ -435,7 +501,7 @@ function renderTask(anim=true){tPhase="task";const c=$("tcard");c.className="car
   $("ttw").hidden=!notes.length;$("ttw").textContent=notes.join("\n");
   $("tnum").textContent="Раунд "+S.tcount+" · "+themeName(tcur.theme)+" · "+LEVELS[tcur.level].name;
   const m=tcur.twist?tcur.twist.mult:1;$("bDone").textContent=isTest?"💚 Зелёный +"+m:genderize("Выполнил(а)",G(curP()))+" +"+m;$("bRef").textContent=isTest?"🚩 Красный":"Отказ −1";
-  $("tChoose").hidden=true;$("tResult").hidden=false;if(anim)enter(c);renderStatus()}
+  $("tChoose").hidden=true;$("tResult").hidden=false;$("tbad").hidden=false;if(anim)enter(c);renderStatus()}
 function bankTd(type){const out=[];const lv=LEVEL_POOL[S.level];
   S.themes.forEach(th=>{if(th==="classic")lv.forEach((l,k)=>TD[type][l].forEach(t=>{for(let w=0;w<(k===0?3:1);w++)out.push({text:t,type,level:l,theme:"classic",src:"база"})}));
     else ((TDT[th]||{})[type]||[]).forEach(t=>out.push({text:t,type,level:S.level,theme:th,src:"база"}))});
@@ -444,7 +510,7 @@ function bankTd(type){const out=[];const lv=LEVEL_POOL[S.level];
 function pickTd(type){const seen=new Set(S.tdSeen.map(norm));const all=bankTd(type);let pool=all.filter(o=>!seen.has(norm(o.text)));
   if(!pool.length){const ks=new Set(all.map(o=>norm(o.text)));S.tdSeen=S.tdSeen.filter(t=>!ks.has(norm(t)));save();pool=all}
   const fresh=pool.filter(o=>{const f=famOf(o.text);return f<0||!recentFam.includes(f)});if(fresh.length)pool=fresh;
-  return pool[Math.floor(Math.random()*pool.length)]}
+  return pickNovel(pool)}
 function noteFam(t){const f=famOf(t);recentFam.push(f);if(recentFam.length>2)recentFam.shift()}
 function takeT(type,g){const q=tq(g)[type];
   let i=q.findIndex(c=>c.level===S.level&&S.themes.includes(c.theme)&&!recentFam.includes(famOf(c.text)));
@@ -454,9 +520,9 @@ let busyT=false;
 async function choose(type){
   if(busyT)return;busyT=true;vib(10);const c=$("tcard");await fly(c,type==="truth"?-1:1);
   const g=G(curP());
-  if(S.apiKey&&!tq(g)[type].length&&pend["td_"+g]){c.className="card loading "+type;$("ttag").textContent="ИИ думает…";$("tq").textContent="";$("tsrc").textContent="";$("tChoose").hidden=true;enter(c);
+  if(S.apiKey&&!tq(g)[type].length&&pend["td_"+g]){c.className="card loading "+type;$("ttag").textContent="ИИ думает…";$("tq").textContent="";$("tsrc").textContent="";$("tChoose").hidden=true;$("tbad").hidden=true;enter(c);
     await Promise.race([pend["td_"+g],sleep(1500)])}
-  tcur=Object.assign({},takeT(type,g)||pickTd(type));if(S.twists&&Math.random()<.2){const tw=TWISTS[type];tcur.twist=tw[Math.floor(Math.random()*tw.length)]}S.tdSeen.push(tcur.text);noteFam(tcur.text);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetchTD(g);busyT=false;
+  tcur=Object.assign({},takeT(type,g)||pickTd(type));if(S.twists&&Math.random()<.2){const tw=TWISTS[type];tcur.twist=tw[Math.floor(Math.random()*tw.length)]}S.tdSeen.push(tcur.text);noteFam(tcur.text);markShown(tcur);S.tcount++;save();c.classList.remove("loading");renderTask(true);prefetchTD(g);busyT=false;
 }
 async function result(done){
   if(busyT)return;busyT=true;const p=curP();const before=leader();
@@ -467,6 +533,7 @@ async function result(done){
   if(S.rnd&&S.players.length>1){let n;do{n=Math.floor(Math.random()*S.players.length)}while(n===S.turn%S.players.length);S.turn=n}else S.turn=(S.turn+1)%S.players.length;
   save();tcur=null;renderChoose(true);busyT=false;
 }
+$("tbad").onclick=e=>{e.stopPropagation();if(busyT||!tcur||tPhase!=="task")return;const type=tcur.type;markBad(tcur);S.tcount--;choose(type)};
 $("bTruth").onclick=()=>choose("truth");$("bDare").onclick=()=>choose("dare");
 $("bDone").onclick=()=>result(true);$("bRef").onclick=()=>result(false);
 
@@ -489,6 +556,8 @@ async function listModels(){
   const r=await fetch(API+"models?pageSize=200",{headers:{"x-goog-api-key":S.apiKey}});
   const j=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(errText(r.status,j));
+  const em=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).some(x=>/embedContent/i.test(x))).map(m=>m.name);
+  EMB_MODEL=em.find(n=>/gemini-embedding/.test(n)&&!/exp|preview/.test(n))||em.find(n=>/text-embedding-004/.test(n))||em.find(n=>/embedding/.test(n))||null;
   const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name);
   const bad=/image|tts|audio|live|embed|vision|learnlm|gemma|robotics|computer|native|thinking/i;
   let c=ms.filter(n=>/gemini/i.test(n)&&/flash/i.test(n)&&!bad.test(n));
@@ -506,7 +575,7 @@ async function callGemini(prompt){
   for(const model of models){
     let tc=thinkCfg(model);
     for(let attempt=0;attempt<2;attempt++){
-      const gc={temperature:1.1,responseMimeType:"application/json"};if(tc)gc.thinkingConfig=tc;
+      const gc={temperature:0.9,responseMimeType:"application/json"};if(tc)gc.thinkingConfig=tc;
       const r=await fetch(API+model+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.apiKey},
         body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:gc})});
       const j=await r.json().catch(()=>({}));
@@ -524,7 +593,7 @@ function cleanN(t){return String(t).trim().replace(/^я\s+никогда\s+не\
 function cleanT(t){return String(t).trim().replace(/^(правда|действие)\s*[:\-—]\s*/i,"").replace(/^[«"]|[»"]$/g,"").replace(/^./,c=>c.toUpperCase())}
 async function genN(n){
   const cats=S.cats.map(c=>c+" — "+CATS[c]).join(", ");
-  const avoid=[...S.seen.slice(-50),...Q.n.map(q=>q.text)].join("; ");
+  const avoid=avoidLine([...S.seen.slice(-25),...Q.n.map(q=>q.text)]);
   const prompt=`Ты придумываешь утверждения для компанейской игры «Я никогда не…» на русском языке.
 Сгенерируй ${n} новых утверждений. Категории (распредели примерно поровну, у каждого укажи id категории): ${cats}.
 Правила:
@@ -532,14 +601,15 @@ async function genN(n){
 - Глагол в прошедшем времени с женской формой в скобках: «прыгал(а) с парашютом», «терялся(ась) в лесу».
 - До 12 слов, конкретно, живо, с юмором. Выбирай то, что делала заметная часть людей (примерно 20–60%), чтобы было интересно признаваться.
 - Все утверждения разные по теме, без повторов и перефразирования друг друга.${S.cats.includes("test")?"\n- Для категории test: провокационные признания про отношения, каждое на РАЗНЫЙ угол из: "+pickN(TEST_ANGLES,7).join("; ")+". Про бывших — не больше одного на пачку. Острые, но без грубостей.":""}${S.cats.includes("adult")?"\n- Для категории adult: откровенно и с флиртом, но без грубостей, без подробных описаний секса и без насилия.":""}
-- Не повторяй и не перефразируй уже использованные: ${avoid||"—"}${groupLine()}
-Ответ — только JSON-массив вида [{"text":"...","cat":"id"}].`;
+${QUALITY}
+${avoid}${groupLine()}
+Ответ — только JSON-массив вида [{"text":"...","cat":"id","idea":"...","score":8}].`;
   let arr=await callGemini(prompt);if(!Array.isArray(arr))arr=Object.values(arr||{}).find(Array.isArray)||[];
   return arr.map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
-    .map(o=>({text:cleanN(o.text),cat:S.cats.includes(o.cat)?o.cat:S.cats[Math.floor(Math.random()*S.cats.length)],src:"ИИ"})).filter(o=>o.text.length>3);
+    .map(o=>({text:cleanN(o.text),idea:o.idea?String(o.idea).slice(0,60):"",score:o.score,cat:S.cats.includes(o.cat)?o.cat:S.cats[Math.floor(Math.random()*S.cats.length)],src:"ИИ"})).filter(o=>o.text.length>3);
 }
 async function genTD(g,n){
-  const lv=S.level;const q=tq(g);const avoid=[...S.tdSeen.slice(-40),...q.truth.map(x=>x.text),...q.dare.map(x=>x.text)].join("; ");
+  const lv=S.level;const q=tq(g);const avoid=avoidLine([...S.tdSeen.slice(-25),...q.truth.map(x=>x.text),...q.dare.map(x=>x.text)]);
   const ths=S.themes.map(t=>t+" — "+THEMES[t].name+": "+THEMES[t].desc).join("; ");
   const who=g==="m"?"Вопросы и задания для ПАРНЯ. Пиши глаголы и прилагательные в мужском роде без скобок («пробовал», «готов», «сам»). Если речь о второй половинке или бывших — по умолчанию это девушка («твоя девушка», «твоя бывшая»)."
     :g==="f"?"Вопросы и задания для ДЕВУШКИ. Пиши глаголы и прилагательные в женском роде без скобок («пробовала», «готова», «сама»). Если речь о второй половинке или бывших — по умолчанию это парень («твой парень», «твой бывший»)."
@@ -555,20 +625,22 @@ ${who}${groupLine()}
 - Обращайся на «ты». До 20 слов, конкретно, весело, без банальностей, все варианты разные.${test}
 - Действия только безопасные, на 1–2 минуты: без алкоголя, опасных трюков, публикаций в соцсетях, звонков и сообщений посторонним, порчи вещей.
 - Можно упоминать других игроков: «игрок слева», «игрок справа», «тот, кого выберет группа».
-- Не повторяй уже использованные: ${avoid||"—"}
-Ответ — только JSON вида {"truth":[{"text":"...","theme":"id"}],"dare":[{"text":"...","theme":"id"}]}.`;
+${QUALITY}
+${avoid}
+Ответ — только JSON вида {"truth":[{"text":"...","theme":"id","idea":"...","score":8}],"dare":[{"text":"...","theme":"id","idea":"...","score":8}]}.`;
   const res=await callGemini(prompt);
   const fix=(arr,type)=>(Array.isArray(arr)?arr:[]).map(o=>typeof o==="string"?{text:o}:o).filter(o=>o&&o.text)
-    .map(o=>({text:cleanT(o.text),type,level:lv,g,theme:S.themes.includes(o.theme)?o.theme:S.themes[Math.floor(Math.random()*S.themes.length)],src:"ИИ"})).filter(o=>o.text.length>5);
+    .map(o=>({text:cleanT(o.text),idea:o.idea?String(o.idea).slice(0,60):"",score:o.score,type,level:lv,g,theme:S.themes.includes(o.theme)?o.theme:S.themes[Math.floor(Math.random()*S.themes.length)],src:"ИИ"})).filter(o=>o.text.length>5);
   return {truth:fix(res&&res.truth,"truth"),dare:fix(res&&res.dare,"dare")};
 }
 function prefetchTD(g){
   const k="td_"+g;if(!S.apiKey)return null;if(pend[k])return pend[k];const q=tq(g);if(q.truth.length>=4&&q.dare.length>=4)return null;
-  const sig=S.level+S.themes.join()+groupLine();const n=(q.truth.length+q.dare.length)<2?5:10;
+  const sig=S.level+S.themes.join()+groupLine();const n=(q.truth.length+q.dare.length)<2?6:12;
   pend[k]=(async()=>{try{
       const r=await genTD(g,n);if(sig!==S.level+S.themes.join()+groupLine())return;
-      const have=new Set([...S.tdSeen,...q.truth.map(x=>x.text),...q.dare.map(x=>x.text)].map(norm));
-      ["truth","dare"].forEach(t=>{r[t].forEach(it=>{const h=norm(it.text);if(!have.has(h)){have.add(h);tq(g)[t].push(it)}});const a=tq(g)[t];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}});
+      const seenN=new Set(S.tdSeen.map(norm));
+      for(const t of ["truth","dare"]){const ok=await filterNew(r[t].filter(it=>!seenN.has(norm(it.text))),t);if(sig!==S.level+S.themes.join()+groupLine())return;ok.forEach(it=>tq(g)[t].push(it))}
+      ["truth","dare"].forEach(t=>{const a=tq(g)[t];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}});
       aiError=""}
     catch(e){aiError=e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google":(e.message||"ошибка сети")}
     finally{pend[k]=null;renderStatus();const q2=tq(g);if(!aiError&&(q2.truth.length<2||q2.dare.length<2)&&sig===S.level+S.themes.join()+groupLine())setTimeout(()=>prefetchTD(g),300)}})();
@@ -580,9 +652,9 @@ function prefetch(k){
   if(!S.apiKey)return null;if(pend[k])return pend[k];if(Q[k].length>=6)return null;
   const lvAt=S.level+S.themes.join();
   pend[k]=(async()=>{try{
-      const items=await genN(Q.n.length<2?10:20);
-      const seenArr=k==="n"?S.seen:S.tdSeen;const have=new Set([...seenArr,...Q[k].map(q=>q.text)].map(norm));
-      items.forEach(it=>{const h=norm(it.text);if(!have.has(h)){have.add(h);Q[k].push(it)}});
+      const items=await genN(Q.n.length<2?12:22);
+      const seenN=new Set(S.seen.map(norm));
+      (await filterNew(items.filter(it=>!seenN.has(norm(it.text))),"n")).forEach(it=>Q.n.push(it));
       for(let i=Q[k].length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[Q[k][i],Q[k][j]]=[Q[k][j],Q[k][i]]}
       aiError=""}
     catch(e){aiError=e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google":(e.message||"ошибка сети")}
@@ -591,16 +663,17 @@ function prefetch(k){
 }
 
 /* ---------- MODALS ---------- */
-function openSet(){stopTimer();$("key").value=S.apiKey;$("timer").value=S.timer;$("keyRes").textContent=S.model?"Модель: "+S.model.replace("models/",""):"";$("mSet").classList.add("open")}
+function dedupText(){return "🧹 Фильтр повторов: "+(EMB_MODEL?"смысловой (эмбеддинги Gemini) + по словам":S.apiKey?"по словам и сути вопроса (смысловой включится после проверки ключа)":"по словам")+" · в памяти "+HIST.length+" вопросов"}
+function openSet(){stopTimer();$("dedupInfo").textContent=dedupText();$("key").value=S.apiKey;$("timer").value=S.timer;$("keyRes").textContent=S.model?"Модель: "+S.model.replace("models/",""):"";$("mSet").classList.add("open")}
 document.querySelectorAll("[data-set]").forEach(b=>b.onclick=openSet);$("aiBtn").onclick=openSet;
 $("keyShow").onclick=()=>{const k=$("key");k.type=k.type==="password"?"text":"password"};
-$("key").onchange=()=>{const v=$("key").value.trim();if(v!==S.apiKey){S.apiKey=v;S.model="";MODELS=null;Q.n=[];resetTD();aiError="";save()}};
+$("key").onchange=()=>{const v=$("key").value.trim();if(v!==S.apiKey){S.apiKey=v;S.model="";MODELS=null;EMB_MODEL=undefined;Q.n=[];resetTD();aiError="";save()}};
 $("keyTest").onclick=async()=>{$("key").onchange();if(!S.apiKey){$("keyRes").textContent="Вставь ключ";return}
   $("keyRes").innerHTML='<span class="spin"></span>Проверяю…';
-  try{const it=await genN(5);Q.n.push(...it);aiError="";$("keyRes").textContent="✅ Работает! Модель: "+S.model.replace("models/","")+". Пример: «Я никогда не "+(it[0]?.text||"…")+"»"}
+  try{const it=await genN(5);Q.n.push(...it);aiError="";$("keyRes").textContent="✅ Работает! Модель: "+S.model.replace("models/","")+". Пример: «Я никогда не "+(it[0]?.text||"…")+"»";$("dedupInfo").textContent=dedupText()}
   catch(e){$("keyRes").textContent="❌ "+(e.message==="Failed to fetch"||e.message==="Load failed"?"Нет связи с Google. Открой игру по ссылке в Safari/Chrome":e.message)}};
 $("timer").onchange=()=>{S.timer=+$("timer").value;save()};
-$("resetSeen").onclick=()=>{if(confirm("Сбросить историю показанных вопросов и заданий?")){S.seen=[];S.tdSeen=[];S.count=0;S.tcount=0;save();toast("История сброшена")}};
+$("resetSeen").onclick=()=>{if(confirm("Сбросить историю показанных вопросов и заданий?")){S.seen=[];S.tdSeen=[];S.ideas=[];S.bad=[];S.count=0;S.tcount=0;EMB=[];PEND_EMB=[];try{localStorage.removeItem(LS+"_emb")}catch(e){}initHist();save();toast("История сброшена")}};
 $("resetScore").onclick=()=>{if(!confirm("Обнулить очки всех игроков?"))return;S.players.forEach(p=>{p.score=0;p.refuse=0;p.redflags=0});S.turn=0;save();renderPlayers();if($("td").classList.contains("active"))renderTurn();toast("Счёт обнулён")};
 $("setClose").onclick=()=>{$("key").onchange();$("mSet").classList.remove("open");renderHome();renderStatus();if($("game").classList.contains("active"))startTimer();
   if(S.mode==="td")warmTD();else prefetch("n")};
